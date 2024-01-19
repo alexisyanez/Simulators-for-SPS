@@ -21,7 +21,7 @@ else:
 # =============================================================================
 # change the path based on your configuration
 # =============================================================================
-sumoBinary = r"C:\Program Files (x86)\DLR\Sumo\bin\sumo-gui.exe" # updating the SUMO path
+sumoBinary = r"/usr/bin/sumo"  #C:\Program Files (x86)\DLR\Sumo\bin\sumo-gui.exe" # updating the SUMO path
 sumoCmd = [sumoBinary, "-c", "ETSI_TR_138_913_V14_3_0_urban.sumocfg"]
 
     
@@ -57,7 +57,7 @@ def vehicle_information():
 
 
        if 100<step<=500: # sampling time duration
-           filename_locations='Data_ped\\location_for_timestep'+str(step) # each csv-file for each step
+           filename_locations='Data_ped/location_for_timestep'+str(step) # each csv-file for each step
            f = open('%s.csv'%filename_locations,'w',newline='')
            writer = csv.writer(f)
            for i in location_list:
