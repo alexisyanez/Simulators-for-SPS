@@ -12,6 +12,7 @@ import copy
 import random
 from list_process import transfer_2Dlist_to_1Dlist
 from RBG import RGBs_set
+from Obstacles import Obstacles
 
 
 # =============================================================================
@@ -23,7 +24,7 @@ from RBG import RGBs_set
 
 class Vehicle():
     
-    def __init__(self, index, location, power, p_resource_keeping,RCrange,target_distance):
+    def __init__(self, index, location, power, p_resource_keeping,RCrange,target_distance,obstacles_bool,obstacles):
         self.index = index
         self.type = location[3]
         #print(self.type) just to dbug the type
@@ -66,6 +67,10 @@ class Vehicle():
         self.candidate_chosen_list = []
         self.bm_reception_record = {}
         self.v_RBG_last_one=None
+        self.obstacles_bool=obstacles_bool
+        self.obstacles=obstacles # Getting obstacles from main class
+
+        
 
         
         
@@ -139,12 +144,22 @@ class Vehicle():
         distance = math.sqrt(math.pow((v2_location[0] - v1_location[0]), 2) + math.pow((v2_location[1] - v1_location[1]), 2))
         return distance
     
-    def receive_power(self,vehicle):
+    def receive_power(self,vehicle):        
         k0 = 10**(-4.38)
-        #if self.distance(vehicle) != 0:
-        return k0*vehicle.power*self.distance(vehicle)**(-3.68)
-        #else:
-        #    return k0*vehicle.power*0.1**(-3.68)
+        if self.distance(vehicle) != 0:
+            # Substract losses from obstacles in the receive power
+            if self.obstacles_bool==True:
+                obs_loss = self.obstacles.getObsaclesLossess(self.location,vehicle.location)
+                return k0*vehicle.power*self.distance(vehicle)**(-3.68) - obs_loss
+            else:   
+                return k0*vehicle.power*self.distance(vehicle)**(-3.68)
+        else:
+            if self.obstacles_bool==True:
+                obs_loss = self.obstacles.getObsaclesLossess(self.location,vehicle.location)
+                return k0*vehicle.power*0.1**(-3.68) - obs_loss
+            else:   
+                return k0*vehicle.power*0.1**(-3.68)
+            
     
     # check if the slot can be measured by the object vehicle, due to the half duplex
     def observation_boolean(self, v_RBG):
