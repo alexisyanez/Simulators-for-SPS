@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from RBG import RBG
 from Channel import Channel
+from Obstacles import Obstacles
 import sys
 import time
 import argparse
@@ -22,11 +23,12 @@ parser = argparse.ArgumentParser(description=\
                                  \n--rcl: RC lower bound,\
                                  \n--rch: RC higher bound,\
                                  \n--cr: fixed candidate ratio (0.1,0.2,0.3,0.4,0.5,0.6),\
-                                 \n--mu: NR numerology for SCS (0,1,2 for FR1)')
+                                 \n--mu: NR numerology for SCS (0,1,2 for FR1),\
+                                 \n--obs: Inclusion of obstacles in the scenario')
 
                                 
 parser.add_argument('--cr', type=float, default=0.2)
-parser.add_argument('--r', type=int, default=300000) #10000)#10000) ##original 300000)
+parser.add_argument('--r', type=int, default=6000) #10000) ##original 300000) # este parametro corresponde al tiempo que se desa correr las simulaciones debe ser menor que time_period_all
 parser.add_argument('--td', type=float, default=200)
 parser.add_argument('--sst', type=int, default=0)
 parser.add_argument('--itv', type=int, default=100)
@@ -34,12 +36,19 @@ parser.add_argument('--rcl', type=int, default=5)
 parser.add_argument('--rch', type=int, default=15)
 parser.add_argument('--mu', type=int, default=0)
 
+parser.add_argument('--obs', action='store_true')
+parser.add_argument('--no-obs', dest='obs', action='store_false')
+parser.set_defaults(feature=False)
+
+#parser.add_argument('--obs', type=bool, default=False)
 
 
-def genearate_vehicles(num_vehicle, num_slot, vehicle_location, transmit_power, p_resource_keeping,RCrange,target_distance):
+
+
+def genearate_vehicles(num_vehicle, num_slot, vehicle_location, transmit_power, p_resource_keeping,RCrange,target_distance,obs,obstacles):
     vehicle_instance_list = []
     for i in range(num_vehicle):
-        vehicle_instance_list.append(Vehicle(i,vehicle_location[i],transmit_power,p_resource_keeping,RCrange,target_distance))
+        vehicle_instance_list.append(Vehicle(i,vehicle_location[i],transmit_power,p_resource_keeping,RCrange,target_distance,obs,obstacles))
     return vehicle_instance_list    
         
 def generate_RBGs(num_slot,num_subch):
@@ -52,10 +61,10 @@ def generate_RBGs(num_slot,num_subch):
     return RBG_intance_list
   
  
-def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high,RSRP_ratio_beacon,mu):
+def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high,RSRP_ratio_beacon,mu,obs):
     # parameter settings
     transmit_power = 200
-    time_period_all = 300000 #200 #50000 #50000 #10000 #original 300000 
+    time_period_all = 6000 #300000 #200 #50000 #50000 #10000 #original 300000 # Al parecer este parametro corresponde al tiempo total considerando todas las repeticiones
     num_subch = 4
     
     RCrange = [RC_low,RC_high]
@@ -84,6 +93,13 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     VRUtransmission_condition=[]  # For VRU calculation
     VRUadd_loss_ratio_to_beacon_list = []  # For VRU calculation
 
+    # Initializing buildings in urban scenario
+    obstacles = {}
+    obstacles_bool = obs
+    if obstacles_bool==True:
+        obstacles = Obstacles()
+
+
     RSRP_th = -110
     candidate_ratio_list=[0.1,0.2,0.3,0.4,0.5]  
 
@@ -100,15 +116,15 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # =============================================================================
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
-    for section_index in range(0,int(time_period_all/10000)):
+    for section_index in range(0,int(time_period_all/200)): #10000)):
         #location_file_name = 'sumo_vehicle_location_'+ str(section_index)
         location_file_name = 'v2manhattan_location_s20_'+ str(section_index)
         #location_file_name = 'sumo_vehicle_location' # + str(section_index)
         print('section_index',section_index)
         if section_index==0:
-            LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
+            LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_v2/%s.csv"%(location_file_name),header=None)).tolist()
         else:    
-            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()))
+            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_v2/%s.csv"%(location_file_name),header=None)).tolist()))
 
     # location_file_name = 'sumo_vehicle_location'
     # LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
@@ -137,12 +153,13 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     print('transmit_power',transmit_power)
     print('target_distance',target_distance)
     print('NR numerology',mu)
+    print('Obstacles',obstacles_bool)
 
     # =============================================================================
     # initialization
     # =============================================================================
     vehicle_list = genearate_vehicles(num_vehicle,time_period,vehicle_location_ini,\
-                                      transmit_power,p_resource_keeping,RCrange,target_distance)
+                                      transmit_power,p_resource_keeping,RCrange,target_distance,obstacles_bool,obstacles)
     #print(vehicle_list[0])
 
     RBG_list = generate_RBGs(time_period,num_subch)
@@ -231,6 +248,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     print('target_distance',target_distance)
     print('NR_numerology',mu)
     print('transmission_condition',transmission_condition)
+    print('Obstacles',obstacles_bool)
     
     print('PDR:',pdr_ratio_list)
     #print('Overall PDR:',list(map(sum, zip(*transmission_condition)))[0]/list(map(sum, zip(*transmission_condition)))[1])
@@ -245,7 +263,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     
 if __name__ == '__main__':
     args = parser.parse_args()   # 解析所有的命令行传入变量
-    main(args.r,args.td,args.sst,args.itv,args.rcl,args.rch,args.cr,args.mu)
+    main(args.r,args.td,args.sst,args.itv,args.rcl,args.rch,args.cr,args.mu,args.obs)
 
 
 
