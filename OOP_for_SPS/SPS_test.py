@@ -63,8 +63,8 @@ def generate_RBGs(num_slot,num_subch):
  
 def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high,RSRP_ratio_beacon,mu,obs):
     # parameter settings
-    transmit_power = 200
-    time_period_all = 6000 #300000 #200 #50000 #50000 #10000 #original 300000 # Al parecer este parametro corresponde al tiempo total considerando todas las repeticiones
+    transmit_power = 200 #this value is in mW units equivalent to 23 dBm
+    time_period_all = 6000 #300000 #200 #50000 #50000 #10000 #original 300000 # it seems this value comes from the total duration over all section data
     num_subch = 4
     
     RCrange = [RC_low,RC_high]
@@ -72,7 +72,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     p_resource_keeping = 0.4
     sensing_window = 1100
     
-    sinr_th = 2**(2.1602)-1
+    sinr_th = 2**(2.1602)-1 # From Table II should be 2.76 dB
     k0 = 10**(-4.38)
     alpha = 3.68
             

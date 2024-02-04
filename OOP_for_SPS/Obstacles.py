@@ -5,8 +5,8 @@ class Obstacles():
     
     def __init__(self):
         self.buildings ={}
-        self.beta = 9.2 # in dB values form Sommer's paper
-        self.gamma = 0.32 # in dB/m values from Sommer's paper
+        self.beta = 9.2 # in dB per wall values form Sommer's paper
+        self.gamma = 0.32 # in dB per meter values from Sommer's paper
 
         # Loading building from "ETSI_TR_138_913_V14_3_0_urban.poly.xml" file
         self.buildings[0] = Polygon([(262.490000,420.330000), (262.490000,12.330000), (487.490000,12.330000), (487.490000,420.330000), (326.350000,420.330000), (262.490000,420.330000)])
@@ -22,13 +22,14 @@ class Obstacles():
 
         
     def getObsaclesLossess(self,location1,location2):
-        TotalLoss = 0
+        #TotalLoss_dB = 0
+        TotalLoss_mW = 0
         #print(location1[0])
         #print(location2[0])
         # Drawing a line with the transmiter and receiver node
         TxRxLine = LineString( [(location1[0], location1[1]),(location2[0],location2[1]) ] ) 
         
-        # Geting the intersection between the line and the buildings and the line 
+        # Geting the intersection between the line and the buildings 
         for i in range (0,len(self.buildings)):
             polydiff = TxRxLine.intersection(self.buildings[i])
             x,y = polydiff.coords.xy
@@ -38,9 +39,11 @@ class Obstacles():
             if list(x):
                 pointA=Point(listx[0],listy[0])
                 pointB=Point(listx[1],listy[1])
-                TotalLoss = TotalLoss + 2*self.beta + shapely.distance(pointA,pointB)*self.gamma
+                #TotalLoss_dB = TotalLoss_dB + 2*self.beta + shapely.distance(pointA,pointB)*self.gamma
+                TotalLoss_mW = TotalLoss_mW + 10**((2*self.beta)/10) + 10**((shapely.distance(pointA,pointB)*self.gamma)/10)
+        #TotalLoss = 10**(TotalLoss_dB)+10**
         
-        return TotalLoss
+        return TotalLoss_mW
      
 
 
