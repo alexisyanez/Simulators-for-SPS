@@ -33,7 +33,7 @@ def vehicle_information():
     x_coordinate = np.array([])
     y_coordinate = np.array([])
     
-    while step < 1000: 
+    while step < 16200: #1000: 
        location_list=[]
        traci.simulationStep()
 
@@ -56,7 +56,7 @@ def vehicle_information():
            index +=1         
 
 
-       if 100<step<=500: # sampling time duration
+       if 10000<step<=16100: # sampling time duration
            filename_locations='Data_ped/location_for_timestep'+str(step) # each csv-file for each step
            f = open('%s.csv'%filename_locations,'w',newline='')
            writer = csv.writer(f)
