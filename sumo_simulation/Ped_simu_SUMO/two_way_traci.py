@@ -22,7 +22,7 @@ else:
 # change the path based on your configuration
 # =============================================================================
 sumoBinary = r"/usr/bin/sumo"  #C:\Program Files (x86)\DLR\Sumo\bin\sumo-gui.exe" # updating the SUMO path
-sumoCmd = [sumoBinary, "-c", "ETSI_TR_138_913_V14_3_0_urban.sumocfg"]
+sumoCmd = [sumoBinary, "-c", "V2_ETSI_TR_138_913_V14_3_0_urban.sumocfg"]
 
     
 
@@ -33,15 +33,15 @@ def vehicle_information():
     x_coordinate = np.array([])
     y_coordinate = np.array([])
     
-    while step < 16200: #1000: 
+    while step < 14200: #1000: 
        location_list=[]
        traci.simulationStep()
 
        #vehicles parser
        for vehicleId in traci.vehicle.getIDList():
            x, y = traci.vehicle.getPosition(vehicleId)           
-           x_coordinate = round(x,2)
-           y_coordinate = round(y,2)
+           x_coordinate = round(x,3)
+           y_coordinate = round(y,3)
            type = traci.vehicle.getTypeID(vehicleId) 
            location_list.append([vehicleId,x_coordinate,y_coordinate,type]) # saving three items in each line
            index +=1  
@@ -49,14 +49,14 @@ def vehicle_information():
        #person parser
        for personId in traci.person.getIDList():
            x, y = traci.person.getPosition(personId)           
-           x_coordinate = round(x,2)
-           y_coordinate = round(y,2)
+           x_coordinate = round(x,3)
+           y_coordinate = round(y,3)
            type = traci.person.getTypeID(personId)
            location_list.append([personId,x_coordinate,y_coordinate,type]) # saving three items in each line
            index +=1         
 
 
-       if 10000<step<=16100: # sampling time duration
+       if 8000<step<=14100: # sampling time duration
            filename_locations='Data_ped/location_for_timestep'+str(step) # each csv-file for each step
            f = open('%s.csv'%filename_locations,'w',newline='')
            writer = csv.writer(f)
