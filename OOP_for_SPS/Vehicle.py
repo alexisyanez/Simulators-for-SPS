@@ -150,15 +150,19 @@ class Vehicle():
             # Substract losses from obstacles in the receive power
             if self.obstacles_bool==True:
                 obs_loss = self.obstacles.getObsaclesLossess(self.location,vehicle.location)
-                return k0*vehicle.power*self.distance(vehicle)**(-3.68) - obs_loss
+                Total_loss = k0*vehicle.power*self.distance(vehicle)**(-3.68) - obs_loss
+                if Total_loss>=0: 
+                    return k0*vehicle.power*self.distance(vehicle)**(-3.68) - obs_loss
+                else: 
+                    return 0
             else:   
                 return k0*vehicle.power*self.distance(vehicle)**(-3.68)
         else:
-            if self.obstacles_bool==True:
-                obs_loss = self.obstacles.getObsaclesLossess(self.location,vehicle.location)
-                return k0*vehicle.power*0.1**(-3.68) - obs_loss
-            else:   
-                return k0*vehicle.power*0.1**(-3.68)
+            #if self.obstacles_bool==True:
+            #    obs_loss = self.obstacles.getObsaclesLossess(self.location,vehicle.location)
+            #    return k0*vehicle.power*0.1**(-3.68) - obs_loss
+            #else:   
+            return k0*vehicle.power*0.1**(-3.68)
             
     
     # check if the slot can be measured by the object vehicle, due to the half duplex
