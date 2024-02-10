@@ -15,7 +15,7 @@ for j in range(0,30):
     vehicle_data=[] 
     for s in range(1+200*j,201+200*j): # range(1,6001):
          
-        step_number=10000+s
+        step_number=8000+s
         #print(str(step_number))
         location_step=pd.read_csv("Data_ped/location_for_timestep%s.csv"%str(step_number),header=None)
         vehicle_data.append(location_step)
