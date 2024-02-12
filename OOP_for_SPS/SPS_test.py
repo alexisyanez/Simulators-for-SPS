@@ -71,7 +71,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     
     RCrange = [RC_low,RC_high]
     #RSRP_ratio_beacon = 0.2
-    p_resource_keeping = 0.4
+    p_resource_keeping = 0 #0.4
     sensing_window = 1100
     
     sinr_th = 2**(2.1602)-1 # From Table II on the SPS paper should be 2.76 dB
@@ -127,10 +127,10 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
         print('section_index',section_index)
         if section_index==0:
             #LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
-            LocationDataAll=np.array(pd.read_csv("/home/simu5g/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()
+            LocationDataAll=np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()
         else:    
             #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()))
-            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/simu5g/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()))
+            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()))
 
     # location_file_name = 'sumo_vehicle_location'
     # LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
@@ -179,7 +179,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # run till time_period    
     # =============================================================================
     for t in range(0,time_period):
-        if t%10==0: print('t=',t)
+        if t%1000==0: print('t=',t)
         for i in range(num_vehicle):
             # update location and sensing_window
             vehicle_list[i].update_location(ObserveVehicles[t][i])
