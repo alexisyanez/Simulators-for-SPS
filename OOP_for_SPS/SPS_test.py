@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(description=\
 
                                 
 parser.add_argument('--cr', type=float, default=0.2)
-parser.add_argument('--r', type=int, default=300000) #6000 #10000) ##original 300000) # este parametro corresponde al tiempo que se desa correr las simulaciones debe ser menor que time_period_all
+parser.add_argument('--r', type=int, default=6000) #6000 #10000) ##original 300000) # este parametro corresponde al tiempo que se desa correr las simulaciones debe ser menor que time_period_all
 parser.add_argument('--td', type=float, default=200)
 parser.add_argument('--sst', type=int, default=0)
 parser.add_argument('--itv', type=int, default=100)
@@ -64,17 +64,17 @@ def generate_RBGs(num_slot,num_subch):
 def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high,RSRP_ratio_beacon,mu,obs):
     # parameter settings
     transmit_power = 200 #this value is in mW units equivalent to 23 dBm
-    time_period_all = 300000 #6000 #300000 #200 #50000 #50000 #10000 #original 300000 Total time in miliseconds considering all dataset
+    time_period_all = 6000 #300000 #6000 #300000 #200 #50000 #50000 #10000 #original 300000 Total time in miliseconds considering all dataset
     # it seems this value comes from the total duration over all section data
     # each section from the dataset has 200 steps, and each step has 0.05 s, so each section has 10 seconds. 
     num_subch = 4
     
     RCrange = [RC_low,RC_high]
     #RSRP_ratio_beacon = 0.2
-    p_resource_keeping = 0.4
+    p_resource_keeping = 0 #0.4
     sensing_window = 1100
     
-    sinr_th = 2**(2.1602)-1 # From Table II should be 2.76 dB
+    sinr_th = 2**(2.1602)-1 # From Table II on the SPS paper should be 2.76 dB
     k0 = 10**(-4.38)
     alpha = 3.68
             
@@ -118,19 +118,19 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # =============================================================================
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
-    for section_index in range(0,int(time_period_all/10000)): #200)):
+    for section_index in range(0,int(time_period_all/200)): #200)): # Oiriginal 10000
         #location_file_name = 'sumo_vehicle_location_'+ str(section_index)
-        location_file_name = 'v2manhattan_location_s20_'+ str(section_index)
+        #location_file_name = 'v2manhattan_location_s20_'+ str(section_index)
         #location_file_name = 'sumo_vehicle_location' # + str(section_index)
-        #location_file_name = 'v2sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
+        location_file_name = 'v2sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
         
         print('section_index',section_index)
         if section_index==0:
-            LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
-            #LocationDataAll=np.array(pd.read_csv("/home/simu5g/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped/%s.csv"%(location_file_name),header=None)).tolist()
+            #LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
+            LocationDataAll=np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()
         else:    
-            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()))
-            #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/simu5g/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped/%s.csv"%(location_file_name),header=None)).tolist()))
+            #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()))
+            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()))
 
     # location_file_name = 'sumo_vehicle_location'
     # LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
@@ -179,7 +179,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # run till time_period    
     # =============================================================================
     for t in range(0,time_period):
-        if t%100==0: print('t=',t)
+        if t%1000==0: print('t=',t)
         for i in range(num_vehicle):
             # update location and sensing_window
             vehicle_list[i].update_location(ObserveVehicles[t][i])
@@ -207,7 +207,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
             if t>0 and t == vehicle_list[i].v_RBG.timeslot:
                 vehicle_list[i].statistic_for_reception(vehicle_list,sinr_th,noise,t,start_sampling_time)
                     
-        if t>start_sampling_time and t%10000==0:
+        if t>start_sampling_time and t%1000==0:
             sum_tran = 0
             sum_rec = 0     
 

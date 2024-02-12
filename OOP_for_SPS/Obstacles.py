@@ -1,4 +1,5 @@
 import shapely
+#import shapely.distance
 from shapely.geometry import Polygon, LineString, Point
 
 class Obstacles():
@@ -40,7 +41,7 @@ class Obstacles():
                 pointA=Point(listx[0],listy[0])
                 pointB=Point(listx[1],listy[1])
                 #TotalLoss_dB = TotalLoss_dB + 2*self.beta + shapely.distance(pointA,pointB)*self.gamma
-                TotalLoss_mW = TotalLoss_mW + 10**((2*self.beta)/10) + 10**((shapely.distance(pointA,pointB)*self.gamma)/10)
+                TotalLoss_mW = TotalLoss_mW + 10**((2*self.beta)/10) + 10**((pointA.distance(pointB)*self.gamma)/10)
         #TotalLoss = 10**(TotalLoss_dB)+10**
         
         return TotalLoss_mW
