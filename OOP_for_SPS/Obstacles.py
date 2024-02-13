@@ -6,7 +6,7 @@ class Obstacles():
     
     def __init__(self):
         self.buildings ={}
-        self.beta = 9.2 # in dB per wall values form Sommer's paper
+        self.beta = 9 #.2 # in dB per wall values form Sommer's paper
         self.gamma = 0.32 # in dB per meter values from Sommer's paper
 
         # Loading building from "ETSI_TR_138_913_V14_3_0_urban.poly.xml" file
@@ -40,8 +40,8 @@ class Obstacles():
             if len(listx) > 1 and len(listy) > 1 :
                 pointA=Point(listx[0],listy[0])
                 pointB=Point(listx[1],listy[1])
-                #TotalLoss_dB = TotalLoss_dB + 2*self.beta + shapely.distance(pointA,pointB)*self.gamma
-                TotalLoss_mW = TotalLoss_mW + 10**((2*self.beta)/10) + 10**((pointA.distance(pointB)*self.gamma)/10)
+                TotalLoss_dB =  2*self.beta + pointA.distance(pointB)*self.gamma #TotalLoss_dB + 2*self.beta + shapely.distance(pointA,pointB)*self.gamma
+                TotalLoss_mW = TotalLoss_mW + 10**(-TotalLoss_dB/10) #10**((2*self.beta)/10) + 10**((pointA.distance(pointB)*self.gamma)/10)
         #TotalLoss = 10**(TotalLoss_dB)+10**
         
         return TotalLoss_mW
