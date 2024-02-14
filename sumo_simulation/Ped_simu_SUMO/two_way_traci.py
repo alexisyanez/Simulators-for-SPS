@@ -22,7 +22,7 @@ else:
 # change the path based on your configuration
 # =============================================================================
 sumoBinary = r"/usr/bin/sumo"  #C:\Program Files (x86)\DLR\Sumo\bin\sumo-gui.exe" # updating the SUMO path
-sumoCmd = [sumoBinary, "-c", "V2_ETSI_TR_138_913_V14_3_0_urban.sumocfg"]
+sumoCmd = [sumoBinary, "-c", "V4_ETSI_TR_138_913_V14_3_0_urban.sumocfg"]
 
     
 
@@ -33,7 +33,7 @@ def vehicle_information():
     x_coordinate = np.array([])
     y_coordinate = np.array([])
     
-    while step < 14200: #1000: 
+    while step < 12800: #1000: 
        location_list=[]
        traci.simulationStep()
 
@@ -56,8 +56,8 @@ def vehicle_information():
            index +=1         
 
 
-       if 8000<step<=14100: # sampling time duration
-           filename_locations='Data_ped/location_for_timestep'+str(step) # each csv-file for each step
+       if 6600<step<=12700: # sampling time duration
+           filename_locations='Data_ped/v4location_for_timestep'+str(step) # each csv-file for each step
            f = open('%s.csv'%filename_locations,'w',newline='')
            writer = csv.writer(f)
            for i in location_list:
