@@ -150,9 +150,10 @@ class Vehicle():
             # Substract losses from obstacles in the receive power
             if self.obstacles_bool==True:
                 obs_loss = self.obstacles.getObsaclesLossess(self.location,vehicle.location)
-                Total_loss = k0*vehicle.power*self.distance(vehicle)**(-3.68) - obs_loss
-                if Total_loss>=0: 
-                    return k0*vehicle.power*self.distance(vehicle)**(-3.68) - obs_loss
+                Total_loss_dB = np.log10(k0*vehicle.power*self.distance(vehicle)**(-3.68))*10 - obs_loss
+                Total_loss_mw = 10**(Total_loss_dB/10)
+                if Total_loss_mw>=0: 
+                    return Total_loss_mw
                 else: 
                     return 0
             else:   
@@ -210,13 +211,17 @@ class Vehicle():
         self.remove_outofdate_sensing(current_time, RBG_list,sensing_window)
         self.add_uptodate_sensing(current_time, vehicles, RBG_list)
         
+        ####################### Important #########################################
+        ## As shown in https://ieeexplore.ieee.org/document/9579000, there are no more average evaluation over 5G-NR
+        ###########################################################################
+        
     def evaluate_average_power(self,observed_RBG, channel):
         sum_power_list = []
         RBGlist_1100ms_temp=transfer_2Dlist_to_1Dlist(self.RBGlist_1100ms)
         for RB in RBGlist_1100ms_temp:
-            if RB.subchannel == observed_RBG.subchannel and (observed_RBG.timeslot - RB.timeslot)%(channel.interval) == 0:  
+            if RB.subchannel == observed_RBG.subchannel: # and (observed_RBG.timeslot - RB.timeslot)%(channel.interval) == 0:  
                 sum_power_list.append(self.sensepower_1100ms[RB])
-        self.prepower_in_selection_window[observed_RBG] = np.average(sum_power_list)
+        self.prepower_in_selection_window[observed_RBG] = sum_power_list[0] # np.average(sum_power_list)
 
     def evaluate_power_in_selection_window(self, channel):
         self.prepower_in_selection_window={}

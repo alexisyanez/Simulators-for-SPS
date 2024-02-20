@@ -27,7 +27,7 @@ parser = argparse.ArgumentParser(description=\
                                  \n--obs: Inclusion of obstacles in the scenario')
 
                                 
-parser.add_argument('--cr', type=float, default=0.2)
+parser.add_argument('--cr', type=float, default=1) #we remove the list L2 for NR as is shown in: https://ieeexplore.ieee.org/document/9579000
 parser.add_argument('--r', type=int, default=6000) #6000 #10000) ##original 300000) # este parametro corresponde al tiempo que se desa correr las simulaciones debe ser menor que time_period_all
 parser.add_argument('--td', type=float, default=200)
 parser.add_argument('--sst', type=int, default=0)
@@ -122,15 +122,15 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
         #location_file_name = 'sumo_vehicle_location_'+ str(section_index)
         #location_file_name = 'v2manhattan_location_s20_'+ str(section_index)
         #location_file_name = 'sumo_vehicle_location' # + str(section_index)
-        location_file_name = 'v2sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
+        location_file_name = 'type_v4sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
         
         print('section_index',section_index)
         if section_index==0:
-            #LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
-            LocationDataAll=np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()
+            LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_ped_v4/%s.csv"%(location_file_name),header=None)).tolist()
+            #LocationDataAll=np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()
         else:    
-            #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()))
-            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()))
+            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_ped_v4/%s.csv"%(location_file_name),header=None)).tolist()))
+            #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()))
 
     # location_file_name = 'sumo_vehicle_location'
     # LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()

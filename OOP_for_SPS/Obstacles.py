@@ -6,11 +6,11 @@ class Obstacles():
     
     def __init__(self):
         self.buildings ={}
-        self.beta = 9.2 # in dB per wall values form Sommer's paper
-        self.gamma = 0.32 # in dB per meter values from Sommer's paper
+        self.beta =  9 #9.2 # in dB per wall values form Sommer's paper https://ieeexplore.ieee.org/document/5720204
+        self.gamma = 0.4 #0.32 # in dB per meter values from Sommer's paper https://ieeexplore.ieee.org/document/5720204
 
         # Loading building from "ETSI_TR_138_913_V14_3_0_urban.poly.xml" file
-        self.buildings[0] = Polygon([(262.490000,420.330000), (262.490000,12.330000), (487.490000,12.330000), (487.490000,420.330000), (326.350000,420.330000), (262.490000,420.330000)]) # Former corner: 262.490000,420.330000 South-Est Squar
+        self.buildings[0] = Polygon([(262.490000,420.330000), (262.490000,12.330000), (487.490000,12.330000), (487.490000,420.330000), (326.350000,420.330000), (262.490000,420.330000)]) # Former corner: 262.490000,420.330000 South-Est Square
         self.buildings[1] = Polygon([(12.410000,853.580000), (12.410000,445.580000), (237.410000,445.580000), (237.410000,853.580000), (76.270000,853.580000), (12.410000,853.580000)]) # Former corner: 237.410000,445.580000 North-West Square
         self.buildings[2] = Polygon([(262.570000,853.420000), (262.570000,445.420000), (487.570000,445.420000), (487.570000,853.420000), (326.430000,853.420000), (262.570000,853.420000)]) # Former corner: 262.570000,445.420000 Nort-Est Square
         #self.buildings[3] = Polygon([(512.270000,420.480000), (512.270000,12.480000), (737.270000,12.480000), (737.270000,420.480000), (576.130000,420.480000), (512.270000,420.480000)])
@@ -23,8 +23,8 @@ class Obstacles():
 
         
     def getObsaclesLossess(self,location1,location2):
-        #TotalLoss_dB = 0
-        TotalLoss_mW = 0
+        TotalLoss_dB = 0
+        #TotalLoss_mW = 0
         #print(location1[0])
         #print(location2[0])
         # Drawing a line with the transmiter and receiver node
@@ -41,10 +41,10 @@ class Obstacles():
                 pointA=Point(listx[0],listy[0])
                 pointB=Point(listx[1],listy[1])
                 TotalLoss_dB =  2*self.beta + pointA.distance(pointB)*self.gamma #TotalLoss_dB + 2*self.beta + shapely.distance(pointA,pointB)*self.gamma
-                TotalLoss_mW = TotalLoss_mW + 10**(-TotalLoss_dB/10) #10**((2*self.beta)/10) + 10**((pointA.distance(pointB)*self.gamma)/10)
+                #TotalLoss_mW = TotalLoss_mW + 10**(TotalLoss_dB/10) #10**((2*self.beta)/10) + 10**((pointA.distance(pointB)*self.gamma)/10)
         #TotalLoss = 10**(TotalLoss_dB)+10**
         
-        return TotalLoss_mW
+        return TotalLoss_dB
      
 
 

@@ -9,7 +9,7 @@ point = Point(0, 0)
 #print(shapely.distance(None, point))
 
 
-locationTx=[0.0,262]
-locationRx=[746,1106]
+locationTx=[276,432]
+locationRx=[249,100]
 obstacles = Obstacles()
 print(obstacles.getObsaclesLossess(locationTx,locationRx))
