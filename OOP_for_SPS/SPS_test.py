@@ -24,7 +24,8 @@ parser = argparse.ArgumentParser(description=\
                                  \n--rch: RC higher bound,\
                                  \n--cr: fixed candidate ratio (0.1,0.2,0.3,0.4,0.5,0.6),\
                                  \n--mu: NR numerology for SCS (0,1,2 for FR1),\
-                                 \n--obs: Inclusion of obstacles in the scenario')
+                                 \n--obs: Inclusion of obstacles in the scenario\
+                                 \n--ds: density scenario')
 
                                 
 parser.add_argument('--cr', type=float, default=1) #we remove the list L2 for NR as is shown in: https://ieeexplore.ieee.org/document/9579000
@@ -39,6 +40,7 @@ parser.add_argument('--mu', type=int, default=0)
 parser.add_argument('--obs', action='store_true')
 parser.add_argument('--no-obs', dest='obs', action='store_false')
 parser.set_defaults(feature=False)
+parser.add_argument('--ds', type=int, default=2)
 
 #parser.add_argument('--obs', type=bool, default=False)
 
@@ -61,7 +63,7 @@ def generate_RBGs(num_slot,num_subch):
     return RBG_intance_list
   
  
-def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high,RSRP_ratio_beacon,mu,obs):
+def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high,RSRP_ratio_beacon,mu,obs,ds):
     # parameter settings
     transmit_power = 200 #this value is in mW units equivalent to 23 dBm
     time_period_all = 6000 #300000 #6000 #300000 #200 #50000 #50000 #10000 #original 300000 Total time in miliseconds considering all dataset
@@ -91,6 +93,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     transmission_condition=[]
     add_loss_ratio_to_beacon_list = []
 
+    pdr_ratio_list_individual=[[],[]]
+
     VRUpdr_ratio_list=[]   # For VRU calculation
     VRUtransmission_condition=[]  # For VRU calculation
     VRUadd_loss_ratio_to_beacon_list = []  # For VRU calculation
@@ -101,7 +105,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     if obstacles_bool==True:
         obstacles = Obstacles()
 
-
+    ds_index = ds
     RSRP_th = -110
     candidate_ratio_list=[0.1,0.2,0.3,0.4,0.5]  
 
@@ -119,17 +123,29 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
     for section_index in range(0,int(time_period_all/200)): #200)): # Oiriginal 10000
+        if ds_index == 2:
+            location_file_name = 'traffic_data_ped_v2/type_v2sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
+        elif ds_index == 3:
+            location_file_name = 'traffic_data_ped_v3/type_v3sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
+        elif ds_index == 4:
+            location_file_name = 'traffic_data_ped_v4/type_v4sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
+        elif ds_index == 5:
+            location_file_name = 'traffic_data_ped_v5/type_v5sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
+        elif ds_index == 6:            
+            location_file_name = 'traffic_data_ped_v6/type_v6sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
+       
+
         #location_file_name = 'sumo_vehicle_location_'+ str(section_index)
         #location_file_name = 'v2manhattan_location_s20_'+ str(section_index)
         #location_file_name = 'sumo_vehicle_location' # + str(section_index)
-        location_file_name = 'type_v4sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
+        #location_file_name = 'type_v4sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
         
         print('section_index',section_index)
         if section_index==0:
-            LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_ped_v4/%s.csv"%(location_file_name),header=None)).tolist()
+            LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()
             #LocationDataAll=np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()
         else:    
-            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_ped_v4/%s.csv"%(location_file_name),header=None)).tolist()))
+            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()))
             #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()))
 
     # location_file_name = 'sumo_vehicle_location'
@@ -160,6 +176,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     print('target_distance',target_distance)
     print('NR numerology',mu)
     print('Obstacles',obstacles_bool)
+    print('Density_scenario',ds_index)
 
     # =============================================================================
     # initialization
@@ -195,18 +212,21 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
         # update sensing window, selection window and resource selection
         for i in range(num_vehicle):
             vehicle_list[i].generate_RBGlist_1100ms(t, RBG_list, sensing_window)
+            #This is the sensing procedure
             vehicle_list[i].update_sensing_result(t, vehicle_list, RBG_list, sensing_window)
             
             if t>0:
                 if vehicle_list[i].message_list[t]!=None:
                     vehicle_list[i].generate_neighbour_set(vehicle_list)
                     vehicle_list[i].generate_RBGs_in_selection_window(t,RBG_list,interval)
+                   
+                    # Here is the selection for the beacon slot
                     vehicle_list[i].RBG_selection_beacon(RSRP_ratio_beacon, RBG_list, t, channel)
 
             # statistic pdr for beacon messages
             if t>0 and t == vehicle_list[i].v_RBG.timeslot:
                 vehicle_list[i].statistic_for_reception(vehicle_list,sinr_th,noise,t,start_sampling_time)
-                    
+            # Here should be the re-evaluation and pre-emption fase        
         if t>start_sampling_time and t%1000==0:
             sum_tran = 0
             sum_rec = 0     
@@ -215,6 +235,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
             sum_VRUrec = 0 #  collecting metrics for VRU
             
             sum_additional_loss_to_beacons = 0
+
+            individual_PDR = []
             for vehicle in vehicle_list:
                 vehicle.num_tran_em = 0
                 vehicle.num_rec_em = 0
@@ -225,15 +247,22 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                 sum_VRUtran += vehicle.VRUnum_tran
                 sum_VRUrec += vehicle.VRUnum_rec
 
+                individual_PDR.append(vehicle.transmission_statistic)
+
                 vehicle.num_tran = 0
                 vehicle.num_rec = 0
 
                 vehicle.VRUnum_tran = 0
-                vehicle.VRUnum_rec = 0
+                vehicle.VRUnum_rec = 0        
+                vehicle.transmission_statistic = []
+                
                 
             add_loss_ratio_to_beacon_list.append(sum_additional_loss_to_beacons/(sum_additional_loss_to_beacons+sum_rec))
             pdr_ratio_list.append(sum_rec/sum_tran)
             transmission_condition.append([sum_rec,sum_tran])
+
+            pdr_ratio_list_individual[0].append(np.average(individual_PDR))
+            pdr_ratio_list_individual[1].append(np.std(individual_PDR))
 
             VRUadd_loss_ratio_to_beacon_list.append(sum_additional_loss_to_beacons/(sum_additional_loss_to_beacons+sum_VRUrec))
             VRUpdr_ratio_list.append(sum_VRUrec/sum_VRUtran)
@@ -269,7 +298,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     
 if __name__ == '__main__':
     args = parser.parse_args()   # 解析所有的命令行传入变量
-    main(args.r,args.td,args.sst,args.itv,args.rcl,args.rch,args.cr,args.mu,args.obs)
+    main(args.r,args.td,args.sst,args.itv,args.rcl,args.rch,args.cr,args.mu,args.obs,args.ds)
 
 
 
