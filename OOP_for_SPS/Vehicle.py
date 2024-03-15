@@ -103,9 +103,9 @@ class Vehicle():
             self.RBGlist_1100ms = RBG_list[current_time-sensing_window:current_time]
         else:
             self.RBGlist_1100ms = RBG_list[:current_time]
+    
 
-            
-        
+    
     def generate_RBGs_in_selection_window(self,current_time,RBG_list,window_size):
         self.RBGs_in_selection_window = transfer_2Dlist_to_1Dlist(RBG_list[current_time:current_time+window_size])
 
