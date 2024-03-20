@@ -14,6 +14,7 @@ from Obstacles import Obstacles
 import sys
 import time
 import argparse
+import copy
 
 parser = argparse.ArgumentParser(description=\
                                  '--r: running time,\
@@ -81,7 +82,12 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     alpha = 3.68
             
     num_RBs_per_RBG = 10
-    SCS = np.power(15,mu)*(10**3)
+    SCS = 15*(np.power(2,mu))*(10**3)#np.power(15,mu)*(10**3)
+
+    Time_slot=np.float_power(2,-mu)
+    T3=1+np.float_power(2,mu+1)*Time_slot
+    rev_counter=0
+    
     num_sc_per_RB = 12
     bandwidth_per_RB = SCS * num_sc_per_RB
     bandwidth_per_RBG = bandwidth_per_RB * num_RBs_per_RBG
@@ -93,7 +99,9 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     transmission_condition=[]
     add_loss_ratio_to_beacon_list = []
 
-    pdr_ratio_list_individual=[[],[]]
+    ALL_pdr_ratio_list_individual=[[],[]]
+    VRU_pdr_ratio_list_individual=[[],[]]
+    emp_VAP_ratio_list_individual=[[],[]]
 
     VRUpdr_ratio_list=[]   # For VRU calculation
     VRUtransmission_condition=[]  # For VRU calculation
@@ -195,6 +203,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # =============================================================================
     # run till time_period    
     # =============================================================================
+        
     for t in range(0,time_period):
         if t%1000==0: print('t=',t)
         for i in range(num_vehicle):
@@ -211,23 +220,62 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     
         # update sensing window, selection window and resource selection
         for i in range(num_vehicle):
-            vehicle_list[i].generate_RBGlist_1100ms(t, RBG_list, sensing_window)
-            #This is the sensing procedure
-            vehicle_list[i].update_sensing_result(t, vehicle_list, RBG_list, sensing_window)
+            #####################
+            # Sensing procedure #
+            #####################
             
+            vehicle_list[i].generate_RBGlist_1100ms(t, RBG_list, sensing_window)
+                      
+            vehicle_list[i].update_sensing_result(t, vehicle_list, RBG_list, sensing_window)
+            ins=0
             if t>0:
+            ############################
+            # (Re-)Selection procedure #
+            ############################
                 if vehicle_list[i].message_list[t]!=None:
-                    vehicle_list[i].generate_neighbour_set(vehicle_list)
+                    #vehicle_list[i].generate_neighbour_set(vehicle_list) # Removing this line we are not updating in every step the list of neigbhours
                     vehicle_list[i].generate_RBGs_in_selection_window(t,RBG_list,interval)
                    
                     # Here is the selection for the beacon slot
                     vehicle_list[i].RBG_selection_beacon(RSRP_ratio_beacon, RBG_list, t, channel)
-
-            # statistic pdr for beacon messages
+                    vehicle_list[i].lastSel_t = t
+                    ins=0
+            
+            #######################
+            # Re-evaluation check #
+            #######################        
+            if t>0 and t<vehicle_list[i].v_RBG.timeslot - T3 and t > vehicle_list[i].lastSel_t and ins==0:
+                
+                #vehicle_list[i].generate_RBGlist_1100ms(t, RBG_list, sensing_window)
+                #vehicle_list[i].update_sensing_result(t, vehicle_list, RBG_list, sensing_window)
+                        
+                vehicles_copy=copy.copy(vehicle_list[i].neighbour_list)
+                #vehicles_copy.remove(vehicle_list[i])
+                timeslot = vehicle_list[i].v_RBG.timeslot
+                subchannel = vehicle_list[i].v_RBG.subchannel
+                busy=0
+                for vehicle in vehicles_copy:
+                        #print(vehicle.v_RBG.subchannel,subchannel,vehicle.v_RBG.timeslot,timeslot)
+                    if vehicle.v_RBG.subchannel == subchannel and vehicle.v_RBG.timeslot == timeslot:
+                            busy=1
+                if busy == 1: # if the slot is bussy the vehicle trigger again the re-selection procedure
+                    vehicle_list[i].reselection_counter = 0
+                    vehicle_list[i].v_RBG.timeslot = 0                    
+                    #vehicle_list[i].generate_RBGs_in_selection_window(t,RBG_list,interval)                   
+                    # Here is the selection for the beacon slot
+                    #vehicle_list[i].RBG_selection_beacon(RSRP_ratio_beacon, RBG_list, t, channel)
+                    #vehicle_list[i].lastSel_t = t
+                ins=1
+            ########################
+            # Message transmission #
+            ########################           
             if t>0 and t == vehicle_list[i].v_RBG.timeslot:
+                # statistic pdr for beacon messages
+
+                #print('vehicle= '+str(i) + ' tiempo= '+str(t))
                 vehicle_list[i].statistic_for_reception(vehicle_list,sinr_th,noise,t,start_sampling_time)
             # Here should be the re-evaluation and pre-emption fase        
-        if t>start_sampling_time and t%1000==0:
+        if t>start_sampling_time and t%100==0:
             sum_tran = 0
             sum_rec = 0     
 
@@ -237,36 +285,70 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
             sum_additional_loss_to_beacons = 0
 
             individual_PDR = []
+            VRUindividual_PDR = []
+            individual_emp_VAP = []
             for vehicle in vehicle_list:
                 vehicle.num_tran_em = 0
                 vehicle.num_rec_em = 0
+
+                sum_tran = 0
+                sum_rec = 0 
+                VRU_rec = 0
                 
                 sum_tran += vehicle.num_tran
                 sum_rec += vehicle.num_rec
+                
+                
 
-                sum_VRUtran += vehicle.VRUnum_tran
-                sum_VRUrec += vehicle.VRUnum_rec
+                #sum_VRUtran += vehicle.VRUnum_tran
+                #sum_VRUrec += vehicle.VRUnum_rec
 
-                individual_PDR.append(vehicle.transmission_statistic)
+                if sum_tran>0: 
+                    individual_PDR.append(sum_rec/sum_tran) #np.average(vehicle.transmission_statistic))
+                    
+                    if vehicle.type == 1:
+                        VRUindividual_PDR.append(sum_rec/sum_tran)
 
+                    if vehicle.type == 2:
+                        VRU_neig_dup = set(vehicle.VRUreception)
+                        VRU_rec = len(VRU_neig_dup)
+                        len_VRU_N =len(vehicle.VRUneighbour_list)
+
+                        if len_VRU_N > 0:
+                            individual_emp_VAP.append(VRU_rec/len_VRU_N)
+                            #print(VRU_rec/len_VRU_N)
+                    #print(np.average(vehicle.transmission_statistic))
+                
+        
                 vehicle.num_tran = 0
                 vehicle.num_rec = 0
+                vehicle.VRUreception = []
+                vehicle_list[i].generate_neighbour_set(vehicle_list)
 
-                vehicle.VRUnum_tran = 0
-                vehicle.VRUnum_rec = 0        
-                vehicle.transmission_statistic = []
+
+                #vehicle.VRUnum_tran = 0
+                #vehicle.VRUnum_rec = 0        
+                #vehicle.transmission_statistic = []
                 
                 
-            add_loss_ratio_to_beacon_list.append(sum_additional_loss_to_beacons/(sum_additional_loss_to_beacons+sum_rec))
-            pdr_ratio_list.append(sum_rec/sum_tran)
-            transmission_condition.append([sum_rec,sum_tran])
+            #add_loss_ratio_to_beacon_list.append(sum_additional_loss_to_beacons/(sum_additional_loss_to_beacons+sum_rec))
+            #pdr_ratio_list.append(sum_rec/sum_tran)
+            #transmission_condition.append([sum_rec,sum_tran])
 
-            pdr_ratio_list_individual[0].append(np.average(individual_PDR))
-            pdr_ratio_list_individual[1].append(np.std(individual_PDR))
+            ALL_pdr_ratio_list_individual[0].append(np.average(individual_PDR))
+            ALL_pdr_ratio_list_individual[1].append(np.std(individual_PDR))
 
-            VRUadd_loss_ratio_to_beacon_list.append(sum_additional_loss_to_beacons/(sum_additional_loss_to_beacons+sum_VRUrec))
-            VRUpdr_ratio_list.append(sum_VRUrec/sum_VRUtran)
-            VRUtransmission_condition.append([sum_VRUrec,sum_VRUtran])
+            VRU_pdr_ratio_list_individual[0].append(np.average(VRUindividual_PDR))
+            VRU_pdr_ratio_list_individual[1].append(np.std(VRUindividual_PDR))
+
+            #print(emp_VAP_ratio_list_individual)
+        
+            emp_VAP_ratio_list_individual[0].append(np.average(individual_emp_VAP))
+            emp_VAP_ratio_list_individual[1].append(np.std(individual_emp_VAP))
+
+            #VRUadd_loss_ratio_to_beacon_list.append(sum_additional_loss_to_beacons/(sum_additional_loss_to_beacons+sum_VRUrec))
+            #VRUpdr_ratio_list.append(sum_VRUrec/sum_VRUtran)
+            #VRUtransmission_condition.append([sum_VRUrec,sum_VRUtran])
 
             
     
@@ -284,14 +366,25 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     print('NR_numerology',mu)
     print('transmission_condition',transmission_condition)
     print('Obstacles',obstacles_bool)
+    print('Density_scenario',ds_index)
     
-    print('PDR:',pdr_ratio_list)
+    #print('PDR:',pdr_ratio_list)
     #print('Overall PDR:',list(map(sum, zip(*transmission_condition)))[0]/list(map(sum, zip(*transmission_condition)))[1])
     
-    print('Empiric_VAP_transmission_condition',VRUtransmission_condition) # Printing VRU related performance evaluation
-    print('Empiric_VAP_PDR:',VRUpdr_ratio_list)
+    #print('Empiric_VAP_transmission_condition',VRUtransmission_condition) # Printing VRU related performance evaluation
+    #print('Empiric_VAP_PDR:',VRUpdr_ratio_list)
 
-    print('*******************')
+    #print('Empiric_VAP_PDR:',VRUpdr_ratio_list)
+
+    # CAR PDR Individual
+    # VRU PDR Individual
+    # Empiric VAP just from CARs
+
+    print('ALL_PDR_avg_std: ',ALL_pdr_ratio_list_individual)
+    print('VRU_PDR_avg_std: ',VRU_pdr_ratio_list_individual)
+    print('emp_VAP_avg_std: ',emp_VAP_ratio_list_individual)
+
+    #print('*******************')
 
     print('\n')         
 

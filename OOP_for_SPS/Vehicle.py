@@ -44,6 +44,7 @@ class Vehicle():
         self.best_RBG_list_beacon = []
         self.neighbour_list = []
         self.VRUneighbour_list = []  #adding the list of neighbout for VRU
+        self.VRUreception = []  # To check message reception 
         self.transmission_statistic = []
         self.VRUtransmission_statistic = [] # Collecting the statistic for VRU neigbohrs
         self.target_distance = target_distance
@@ -69,8 +70,9 @@ class Vehicle():
         self.v_RBG_last_one=None
         self.obstacles_bool=obstacles_bool
         self.obstacles=obstacles # Getting obstacles from main class
+        self.lastSel_t=float('inf')
 
-        
+  
 
         
         
@@ -105,7 +107,7 @@ class Vehicle():
             self.RBGlist_1100ms = RBG_list[:current_time]
     
 
-    
+
     def generate_RBGs_in_selection_window(self,current_time,RBG_list,window_size):
         self.RBGs_in_selection_window = transfer_2Dlist_to_1Dlist(RBG_list[current_time:current_time+window_size])
 
@@ -246,20 +248,23 @@ class Vehicle():
             self.evaluate_power_in_selection_window(channel)
             self.find_accessible_RBGs_for_beacon(RSRP_ratio_beacon)
             self.v_RBG = random.choice(self.best_RBG_list_beacon)
+            #print(self.v_RBG)
         else:
             self.v_RBG = RBG_list[self.v_RBG.timeslot+channel.interval][self.v_RBG.subchannel]
     
     def generate_neighbour_set(self,vehicles):
         self.neighbour_list = []
         self.VRUneighbour_list = []
+        #self.VRUreception = []
         vehicles_copy = copy.copy(vehicles)
         vehicles_copy.remove(self)
+
         for vehicle in vehicles_copy:
             if self.distance(vehicle)<=self.target_distance:
                 self.neighbour_list.append(vehicle)
-                if vehicle.type == 1 : 
+                if vehicle.type == 1 and self.type == 2: 
                     self.VRUneighbour_list.append(vehicle)
-                
+                    #self.VRUreception.append(0)                            
                                 
     def sum_interference_power(self,receive_vehicle,vehicles):
         sum_interference = 0
@@ -326,6 +331,18 @@ class Vehicle():
                 
                 if current_time>start_sampling_time:
                     self.num_rec += 1
+
+                    if self.type == 1 and vehicle.type == 2:
+                        if self in vehicle.VRUneighbour_list:
+                            vehicle.VRUreception.append(self.index)
+                        #if self in VRU_List:
+                        #    VRU_index = VRU_List.index(self)
+                        #    vehicle.VRUreception[VRU_index]=1
+                    #print("VRU index: ",self.index)
+                    #print("VRU List: ",vehicle.VRUneighbour_list)
+                    #print("VRU recception List: ",vehicle.VRUreception)
+
+
             else:
                 vehicle.bm_reception_record[str([self.index,self.v_RBG.timeslot])]=0
         if num_packet==0:
@@ -333,15 +350,16 @@ class Vehicle():
         else:
             self.transmission_statistic.append(reception/num_packet)
 
+
         #repeat the process for VRU neighbours
 
-        reception = 0     
+"""         reception = 0     
         num_packet = len(self.VRUneighbour_list)
         if current_time>start_sampling_time:
             self.VRUnum_tran += len(self.VRUneighbour_list)
         #print('t=',current_time,self.index,'neighbour_list',self.neighbour_list)
-        for vehicle in self.VRUneighbour_list:
             
+        for vehicle in self.VRUneighbour_list:
             # shorten vehicle.bm_reception_record
             len_record = len(vehicle.bm_reception_record)
             popkeys = list(vehicle.bm_reception_record.keys())[:min(len_record-400,0)]
@@ -353,11 +371,21 @@ class Vehicle():
                 
                 if current_time>start_sampling_time:
                     self.VRUnum_rec += 1
+
+                # This is the Empiric VAP
+                if self.type == 1 and vehicle.type == 2:
+                    VRU_List = vehicle.VRUneighbour_list
+                    if self in VRU_List:
+                        VRU_index = VRU_List.index(self)
+                        vehicle.VRUreception[VRU_index]=1
+                    #print("VRU index: ",self.index)
+                    #print("VRU List: ",vehicle.VRUneighbour_list)
+                    #print("VRU recception List: ",vehicle.VRUreception)
             else:
                 vehicle.bm_reception_record[str([self.index,self.v_RBG.timeslot])]=0
         if num_packet==0:
             self.VRUtransmission_statistic.append(None)
         else:
             self.VRUtransmission_statistic.append(reception/num_packet)
-
         
+ """

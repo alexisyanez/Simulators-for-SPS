@@ -13,3 +13,14 @@ locationTx=[276,432]
 locationRx=[249,100]
 obstacles = Obstacles()
 print(obstacles.getObsaclesLossess(locationTx,locationRx))
+
+list=[0, 1, 2, 3,5,6,7,8,9, 4]
+
+list2 = [list,[0]*len(list)]
+
+list2[1][list2[0].index(4)]=1
+
+
+
+print(list2)
+print(sum(list2[1]))
