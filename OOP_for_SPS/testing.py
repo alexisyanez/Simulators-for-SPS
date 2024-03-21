@@ -1,6 +1,7 @@
 import shapely
 from shapely import LineString, Point, Polygon
 from Obstacles import Obstacles
+import numpy as np
 point = Point(0, 0)
 #print(shapely.distance(Point(10, 0), point))
 #print(shapely.distance(LineString([(1, 1), (1, -1)]), point))
@@ -24,3 +25,11 @@ list2[1][list2[0].index(4)]=1
 
 print(list2)
 print(sum(list2[1]))
+Disntances = np.arange(25, 525, 25)
+
+print(Disntances)
+
+a = False
+b = True
+
+if a and b: print("Hola printie un bool")

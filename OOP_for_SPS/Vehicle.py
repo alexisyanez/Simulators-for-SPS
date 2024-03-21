@@ -24,7 +24,7 @@ from Obstacles import Obstacles
 
 class Vehicle():
     
-    def __init__(self, index, location, power, p_resource_keeping,RCrange,target_distance,obstacles_bool,obstacles):
+    def __init__(self, index, location, power, p_resource_keeping,RCrange,target_distance,obstacles_bool,obstacles,nr):
         self.index = index
         self.type = location[3]
         #print(self.type) just to dbug the type
@@ -71,6 +71,7 @@ class Vehicle():
         self.obstacles_bool=obstacles_bool
         self.obstacles=obstacles # Getting obstacles from main class
         self.lastSel_t=float('inf')
+        self.nr_bool = nr
 
   
 
@@ -211,19 +212,25 @@ class Vehicle():
     
     def update_sensing_result(self, current_time, vehicles, RBG_list, sensing_window):
         self.remove_outofdate_sensing(current_time, RBG_list,sensing_window)
-        self.add_uptodate_sensing(current_time, vehicles, RBG_list)
-        
+        self.add_uptodate_sensing(current_time, vehicles, RBG_list)     
+                
+    def evaluate_average_power(self,observed_RBG, channel):
         ####################### Important #########################################
         ## As shown in https://ieeexplore.ieee.org/document/9579000, there are no more average evaluation over 5G-NR
         ###########################################################################
-        
-    def evaluate_average_power(self,observed_RBG, channel):
         sum_power_list = []
         RBGlist_1100ms_temp=transfer_2Dlist_to_1Dlist(self.RBGlist_1100ms)
         for RB in RBGlist_1100ms_temp:
-            if RB.subchannel == observed_RBG.subchannel: # and (observed_RBG.timeslot - RB.timeslot)%(channel.interval) == 0:  
-                sum_power_list.append(self.sensepower_1100ms[RB])
-        self.prepower_in_selection_window[observed_RBG] = sum_power_list[0] # np.average(sum_power_list)
+            if self.nr_bool:
+                if RB.subchannel == observed_RBG.subchannel: # and (observed_RBG.timeslot - RB.timeslot)%(channel.interval) == 0:  
+                    sum_power_list.append(self.sensepower_1100ms[RB])
+            else:
+                if RB.subchannel == observed_RBG.subchannel and (observed_RBG.timeslot - RB.timeslot)%(channel.interval) == 0:  
+                    sum_power_list.append(self.sensepower_1100ms[RB])
+        if self.nr_bool:
+            self.prepower_in_selection_window[observed_RBG] = sum_power_list[0] # np.average(sum_power_list)
+        else:
+            self.prepower_in_selection_window[observed_RBG] = np.average(sum_power_list)
 
     def evaluate_power_in_selection_window(self, channel):
         self.prepower_in_selection_window={}

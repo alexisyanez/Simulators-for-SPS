@@ -26,32 +26,37 @@ parser = argparse.ArgumentParser(description=\
                                  \n--cr: fixed candidate ratio (0.1,0.2,0.3,0.4,0.5,0.6),\
                                  \n--mu: NR numerology for SCS (0,1,2 for FR1),\
                                  \n--obs: Inclusion of obstacles in the scenario\
-                                 \n--ds: density scenario')
+                                 \n--nr: Activate New Radio adding re-evaluation procedure \
+                                 \n--ds: density scenario\
+                                 \n--sd: Step Duration in ms\
+                                 \n--aw: Awarenesness Window in ms')
 
                                 
-parser.add_argument('--cr', type=float, default=1) #we remove the list L2 for NR as is shown in: https://ieeexplore.ieee.org/document/9579000
-parser.add_argument('--r', type=int, default=6000) #6000 #10000) ##original 300000) # este parametro corresponde al tiempo que se desa correr las simulaciones debe ser menor que time_period_all
+parser.add_argument('--cr', type=float, default=0.2) #we remove the list L2 for NR as is shown in: https://ieeexplore.ieee.org/document/9579000
+parser.add_argument('--r', type=int, default=5000) #6000 #10000) ##original 300000) # este parametro corresponde al tiempo que se desa correr las simulaciones debe ser menor que time_period_all
 parser.add_argument('--td', type=float, default=200)
 parser.add_argument('--sst', type=int, default=0)
-parser.add_argument('--itv', type=int, default=100)
+parser.add_argument('--itv', type=int, default=5)
 parser.add_argument('--rcl', type=int, default=5)
 parser.add_argument('--rch', type=int, default=15)
 parser.add_argument('--mu', type=int, default=0)
 
 parser.add_argument('--obs', action='store_true')
-parser.add_argument('--no-obs', dest='obs', action='store_false')
+parser.add_argument('--no-obs', dest='obs', action='store_false') # Activar o desactivar 
+
+parser.add_argument('--nr', action='store_true')
+parser.add_argument('--no-nr', dest='obs', action='store_false')
+
 parser.set_defaults(feature=False)
-parser.add_argument('--ds', type=int, default=2)
 
-#parser.add_argument('--obs', type=bool, default=False)
+parser.add_argument('--ds', type=int, default=4)
+parser.add_argument('--sd', type=int, default=10)
+parser.add_argument('--aw', type=int, default=100)
 
-
-
-
-def genearate_vehicles(num_vehicle, num_slot, vehicle_location, transmit_power, p_resource_keeping,RCrange,target_distance,obs,obstacles):
+def genearate_vehicles(num_vehicle, num_slot, vehicle_location, transmit_power, p_resource_keeping,RCrange,target_distance,obs,obstacles,nr):
     vehicle_instance_list = []
     for i in range(num_vehicle):
-        vehicle_instance_list.append(Vehicle(i,vehicle_location[i],transmit_power,p_resource_keeping,RCrange,target_distance,obs,obstacles))
+        vehicle_instance_list.append(Vehicle(i,vehicle_location[i],transmit_power,p_resource_keeping,RCrange,target_distance,obs,obstacles,nr))
     return vehicle_instance_list    
         
 def generate_RBGs(num_slot,num_subch):
@@ -64,16 +69,16 @@ def generate_RBGs(num_slot,num_subch):
     return RBG_intance_list
   
  
-def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high,RSRP_ratio_beacon,mu,obs,ds):
+def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high,RSRP_ratio_beacon,mu,obs,ds,nr,aw,sd):
     # parameter settings
     transmit_power = 200 #this value is in mW units equivalent to 23 dBm
-    time_period_all = 6000 #300000 #6000 #300000 #200 #50000 #50000 #10000 #original 300000 Total time in miliseconds considering all dataset
+    time_period_all = 30000 #300000 #6000 #300000 #200 #50000 #50000 #10000 #original 300000 Total time in miliseconds considering all dataset
     # it seems this value comes from the total duration over all section data
     # each section from the dataset has 200 steps, and each step has 0.05 s, so each section has 10 seconds. 
     num_subch = 4
     
     RCrange = [RC_low,RC_high]
-    #RSRP_ratio_beacon = 0.2
+        
     p_resource_keeping = 0 #0.4
     sensing_window = 1100
     
@@ -113,7 +118,11 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     if obstacles_bool==True:
         obstacles = Obstacles()
 
+    nr_bool = nr
     ds_index = ds
+
+    if nr_bool: RSRP_ratio_beacon = 1
+
     RSRP_th = -110
     candidate_ratio_list=[0.1,0.2,0.3,0.4,0.5]  
 
@@ -130,7 +139,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # =============================================================================
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
-    for section_index in range(0,int(time_period_all/200)): #200)): # Oiriginal 10000
+    for section_index in range(0,int(time_period_all/1000)): #200)): # Oiriginal 10000
         if ds_index == 2:
             location_file_name = 'traffic_data_ped_v2/type_v2sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
         elif ds_index == 3:
@@ -190,7 +199,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # initialization
     # =============================================================================
     vehicle_list = genearate_vehicles(num_vehicle,time_period,vehicle_location_ini,\
-                                      transmit_power,p_resource_keeping,RCrange,target_distance,obstacles_bool,obstacles)
+                                      transmit_power,p_resource_keeping,RCrange,target_distance,obstacles_bool,obstacles,nr_bool)
     #print(vehicle_list[0])
 
     RBG_list = generate_RBGs(time_period,num_subch)
@@ -203,7 +212,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # =============================================================================
     # run till time_period    
     # =============================================================================
-        
+    eval_time = aw/sd    
     for t in range(0,time_period):
         if t%1000==0: print('t=',t)
         for i in range(num_vehicle):
@@ -244,7 +253,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
             #######################
             # Re-evaluation check #
             #######################        
-            if t>0 and t<vehicle_list[i].v_RBG.timeslot - T3 and t > vehicle_list[i].lastSel_t and ins==0:
+            if t>0 and t<vehicle_list[i].v_RBG.timeslot - T3 and t > vehicle_list[i].lastSel_t and ins==0 and nr_bool:
                 
                 #vehicle_list[i].generate_RBGlist_1100ms(t, RBG_list, sensing_window)
                 #vehicle_list[i].update_sensing_result(t, vehicle_list, RBG_list, sensing_window)
@@ -275,7 +284,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                 #print('vehicle= '+str(i) + ' tiempo= '+str(t))
                 vehicle_list[i].statistic_for_reception(vehicle_list,sinr_th,noise,t,start_sampling_time)
             # Here should be the re-evaluation and pre-emption fase        
-        if t>start_sampling_time and t%100==0:
+        if t>start_sampling_time and t%eval_time==0:
             sum_tran = 0
             sum_rec = 0     
 
@@ -391,7 +400,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     
 if __name__ == '__main__':
     args = parser.parse_args()   # 解析所有的命令行传入变量
-    main(args.r,args.td,args.sst,args.itv,args.rcl,args.rch,args.cr,args.mu,args.obs,args.ds)
+    main(args.r,args.td,args.sst,args.itv,args.rcl,args.rch,args.cr,args.mu,args.obs,args.ds,args.nr,args.aw,args.sd)
 
 
 
