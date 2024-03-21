@@ -19,7 +19,7 @@ for section_index in range(0,int(time_period_all/10000)):
     location_file_name = 'v4sumo_ped_vehicle_location_sec_' + str(section_index) 
     print('section_index',section_index)
     #Data=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_v2/%s.csv"%(location_file_name),header=None)).tolist()
-    Data=np.array(pd.read_csv("/home/simu5g/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v4/%s.csv"%(location_file_name),header=None)).tolist()
+    Data=np.array(pd.read_csv("/home/simu5g/Simulators-for-SPS/sumo_simulation/Ped_simu_SUMO/Data_ped/%s.csv"%(location_file_name),header=None)).tolist()
     NewData=[]
     for i in range(0,len(Data)):
         p=randrange(10)
