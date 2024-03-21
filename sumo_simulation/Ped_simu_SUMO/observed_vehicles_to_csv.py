@@ -45,7 +45,7 @@ for j in range(0,30):
 # =============================================================================
 # save the locations of all vehicles during a given time period
 # =============================================================================
-    filename='/Data_ped/v4sumo_ped_vehicle_location_sec_'+str(j)
+    filename='/home/simu5g/Simulators-for-SPS/sumo_simulation/Ped_simu_SUMO/Data_ped/v4sumo_ped_vehicle_location_sec_'+str(j)
     n=0
 
     f=open('%s.csv'%filename,'w',newline='')
