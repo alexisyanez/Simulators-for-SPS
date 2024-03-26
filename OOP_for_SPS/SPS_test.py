@@ -162,11 +162,11 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
         
         #print('section_index',section_index)
         if section_index==0:
-            LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()
-            #LocationDataAll=np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()
+            #LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()
+            LocationDataAll=np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()
         else:    
-            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()))
-            #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()))
+            #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()))
+            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()))
 
     # location_file_name = 'sumo_vehicle_location'
     # LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
@@ -342,23 +342,27 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
 
                 #vehicle.VRUnum_tran = 0
                 #vehicle.VRUnum_rec = 0        
-                #vehicle.transmission_statistic = []
-                
-                
+                #vehicle.transmission_statistic =
             #add_loss_ratio_to_beacon_list.append(sum_additional_loss_to_beacons/(sum_additional_loss_to_beacons+sum_rec))
             #pdr_ratio_list.append(sum_rec/sum_tran)
             #transmission_condition.append([sum_rec,sum_tran])
+            if individual_PDR:
 
-            ALL_pdr_ratio_list_individual[0].append(np.average(individual_PDR))
-            ALL_pdr_ratio_list_individual[1].append(np.std(individual_PDR))
+                ALL_pdr_ratio_list_individual[0].append(np.nanmean(individual_PDR))
+                ALL_pdr_ratio_list_individual[1].append(np.nanstd(individual_PDR))
 
-            VRU_pdr_ratio_list_individual[0].append(np.average(VRUindividual_PDR))
-            VRU_pdr_ratio_list_individual[1].append(np.std(VRUindividual_PDR))
+            if VRUindividual_PDR:
+
+                VRU_pdr_ratio_list_individual[0].append(np.nanmean(VRUindividual_PDR))
+                VRU_pdr_ratio_list_individual[1].append(np.nanstd(VRUindividual_PDR))
 
             #print(emp_VAP_ratio_list_individual)
-        
-            emp_VAP_ratio_list_individual[0].append(np.average(individual_emp_VAP))
-            emp_VAP_ratio_list_individual[1].append(np.std(individual_emp_VAP))
+            if individual_emp_VAP:
+                emp_VAP_ratio_list_individual[0].append(np.nanmean(individual_emp_VAP))
+                emp_VAP_ratio_list_individual[1].append(np.nanstd(individual_emp_VAP))
+            #else: 
+            #    emp_VAP_ratio_list_individual[0].append(0)
+            #    emp_VAP_ratio_list_individual[1].append(0)
 
             #VRUadd_loss_ratio_to_beacon_list.append(sum_additional_loss_to_beacons/(sum_additional_loss_to_beacons+sum_VRUrec))
             #VRUpdr_ratio_list.append(sum_VRUrec/sum_VRUtran)
@@ -402,22 +406,55 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     #print('*******************')
 
     #print('\n')
-             
+    
+    if len(ALL_pdr_ratio_list_individual[0]) > 0:
+        avg_ALL_PDR = float(np.nanmean(ALL_pdr_ratio_list_individual[0]))
+    else:
+        avg_ALL_PDR = 0  # O cualquier otro valor predeterminado  
+
+    if len(ALL_pdr_ratio_list_individual[1]) > 0:
+        std_ALL_PDR = float(np.nanmean(ALL_pdr_ratio_list_individual[1]))
+    else:
+        std_ALL_PDR = 0  # O cualquier otro valor predeterminado  
+
+    if len(VRU_pdr_ratio_list_individual[0]) > 0:
+        avg_VRU_PDR = float(np.nanmean(VRU_pdr_ratio_list_individual[0]))
+    else:
+        avg_VRU_PDR = 0  # O cualquier otro valor predeterminado  
+
+    if len(VRU_pdr_ratio_list_individual[1]) > 0:
+        std_VRU_PDR = float(np.nanmean(VRU_pdr_ratio_list_individual[1]))
+    else:
+        std_VRU_PDR = 0  # O cualquier otro valor predeterminado  
+
+    if len(emp_VAP_ratio_list_individual[0]) > 0:
+        avg_emp_VAP = float(np.nanmean(emp_VAP_ratio_list_individual[0]))
+    else:
+        avg_emp_VAP = 0  # O cualquier otro valor predeterminado  
+
+    if len(emp_VAP_ratio_list_individual[1]) > 0:
+        std_emp_VAP = float(np.nanmean(emp_VAP_ratio_list_individual[1]))
+    else:
+        std_emp_VAP = 0  # O cualquier otro valor predeterminado  
+
+
+
+       
     data = {
     "star_time": start_time,
     "end_time": end_time,
-    "ALL_PDR_avg": np.average(ALL_pdr_ratio_list_individual[0]),
-    "ALL_PDR_std": np.average(ALL_pdr_ratio_list_individual[1]),
-    "VRU_PDR_avg": np.average(VRU_pdr_ratio_list_individual[0]),
-    "VRU_PDR_std": np.average(VRU_pdr_ratio_list_individual[1]),
-    "emp_VAP_avg": np.average(VRU_pdr_ratio_list_individual[0]),
-    "emp_VAP_std": np.average(VRU_pdr_ratio_list_individual[1]),
-    "awareness_window": aw,
-    "target_distance": target_distance,
+    "ALL_PDR_avg": avg_ALL_PDR,
+    "ALL_PDR_std": std_ALL_PDR,
+    "VRU_PDR_avg": avg_VRU_PDR,
+    "VRU_PDR_std": std_VRU_PDR,
+    "emp_VAP_avg": avg_emp_VAP,
+    "emp_VAP_std": std_emp_VAP,
+    "awareness_window": int(aw),
+    "target_distance": int(target_distance),
     "obstacles": obstacles_bool,
     "nr": nr_bool,
-    "mu": mu,
-    "sensing_window": sensing_window
+    "mu": int(mu),
+    "sensing_window": int(sensing_window)
     }
 
     # returning JSON object
