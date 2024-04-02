@@ -34,10 +34,10 @@ parser = argparse.ArgumentParser(description=\
 
                                 
 parser.add_argument('--cr', type=float, default=0.2) #we remove the list L2 for NR as is shown in: https://ieeexplore.ieee.org/document/9579000
-parser.add_argument('--r', type=int, default=5000) #6000 #10000) ##original 300000) # este parametro corresponde al tiempo que se desa correr las simulaciones debe ser menor que time_period_all
+parser.add_argument('--r', type=int, default=2000) #6000 #10000) ##original 300000) # este parametro corresponde al tiempo que se desa correr las simulaciones debe ser menor que time_period_all
 parser.add_argument('--td', type=float, default=200)
 parser.add_argument('--sst', type=int, default=0)
-parser.add_argument('--itv', type=int, default=50)
+parser.add_argument('--itv', type=int, default=100)
 parser.add_argument('--rcl', type=int, default=5)
 parser.add_argument('--rch', type=int, default=15)
 parser.add_argument('--mu', type=int, default=0)
@@ -52,7 +52,7 @@ parser.set_defaults(feature=False)
 
 parser.add_argument('--ds', type=int, default=4)
 parser.add_argument('--sd', type=int, default=1)
-parser.add_argument('--aw', type=int, default=100)
+parser.add_argument('--aw', type=int, default=1000)
 
 def genearate_vehicles(num_vehicle, num_slot, vehicle_location, transmit_power, p_resource_keeping,RCrange,target_distance,obs,obstacles,nr):
     vehicle_instance_list = []
@@ -138,7 +138,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # =============================================================================
     # import road traffic
     # =============================================================================
-    #print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
     start_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     
@@ -160,13 +160,13 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
         #location_file_name = 'sumo_vehicle_location' # + str(section_index)
         #location_file_name = 'type_v4sumo_ped_vehicle_location_sec_' + str(section_index) # From pedestrian manhatan scenario + str(section_index) 
         
-        #print('section_index',section_index)
+        print('section_index',section_index)
         if section_index==0:
-            #LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()
-            LocationDataAll=np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()
+            LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()
+            #LocationDataAll=np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()
         else:    
-            #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()))
-            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()))
+            LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()))
+            #LocationDataAll=np.vstack((LocationDataAll,np.array(pd.read_csv("/home/ayanez/Simulators-for-SPS/OOP_for_SPS/%s.csv"%(location_file_name),header=None)).tolist()))
 
     # location_file_name = 'sumo_vehicle_location'
     # LocationDataAll=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data/%s.csv"%(location_file_name),header=None)).tolist()
@@ -185,19 +185,20 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
    #print(ObserveVehicles[1])
     
 
-    #print('time_period',time_period)
-    #print('start_sampling_time',start_sampling_time)
-    #print('RSRP_ratio_beacon',RSRP_ratio_beacon)
-    #print('p_resource_keeping',p_resource_keeping)
-    #print('sensing_window',sensing_window)
-    #print('num_vehicle',num_vehicle)
-    #print('num_subch', num_subch)
-    #print('interval', interval)
-    #print('transmit_power',transmit_power)
-    #print('target_distance',target_distance)
-    #print('NR numerology',mu)
-    #print('Obstacles',obstacles_bool)
-    #print('Density_scenario',ds_index)
+    print('time_period',time_period)
+    print('start_sampling_time',start_sampling_time)
+    print('RSRP_ratio_beacon',RSRP_ratio_beacon)
+    print('p_resource_keeping',p_resource_keeping)
+    print('sensing_window',sensing_window)
+    print('num_vehicle',num_vehicle)
+    print('num_subch', num_subch)
+    print('interval', interval)
+    print('transmit_power',transmit_power)
+    print('target_distance',target_distance)
+    print('NR numerology',mu)
+    print('NR boolean',nr_bool)
+    print('Obstacles',obstacles_bool)
+    print('Density_scenario',ds_index)
 
 
     # =============================================================================
@@ -219,7 +220,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # =============================================================================
     eval_time = aw/sd    
     for t in range(0,time_period):
-        #if t%100==0: print('t=',t)
+        if t%100==0: print('t=',t)
         for i in range(num_vehicle):
             # update location and sensing_window
             vehicle_list[i].update_location(ObserveVehicles[t][i])
@@ -370,22 +371,27 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
 
             
     
-    #print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-    end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())         
-    #print('time_period',time_period)
-    #print('start_sampling_time',start_sampling_time)
-    #print('RSRP_ratio_beacon',RSRP_ratio_beacon)
-    #print('p_resource_keeping',p_resource_keeping)
-    #print('sensing_window',sensing_window)
-    #print('num_vehicle',num_vehicle)
-    #print('num_subch', num_subch)
-    #print('interval', interval)
-    #print('transmit_power',transmit_power)
-    #print('target_distance',target_distance)
-    #print('NR_numerology',mu)
-    #print('transmission_condition',transmission_condition)
-    #print('Obstacles',obstacles_bool)
-    #print('Density_scenario',ds_index)
+    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())    
+
+    print('time_period',time_period)
+    print('start_sampling_time',start_sampling_time)
+    print('RSRP_ratio_beacon',RSRP_ratio_beacon)
+    print('p_resource_keeping',p_resource_keeping)
+    print('sensing_window',sensing_window)
+    print('num_vehicle',num_vehicle)
+    print('num_subch', num_subch)
+    print('interval', interval)
+    print('transmit_power',transmit_power)
+    print('target_distance',target_distance)
+    print('NR_numerology',mu)
+    print('NR boolean',nr_bool)
+    print('transmission_condition',transmission_condition)
+    print('Obstacles',obstacles_bool)
+    print('Density_scenario',ds_index)
+    print('Awareness_window',aw)
+    print('Step_duration',sd)
+     
     
     #print('PDR:',pdr_ratio_list)
     #print('Overall PDR:',list(map(sum, zip(*transmission_condition)))[0]/list(map(sum, zip(*transmission_condition)))[1])
@@ -399,9 +405,9 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     # VRU PDR Individual
     # Empiric VAP just from CARs
 
-    #print('ALL_PDR_avg_std: ',ALL_pdr_ratio_list_individual)
-    #print('VRU_PDR_avg_std: ',VRU_pdr_ratio_list_individual)
-    #print('emp_VAP_avg_std: ',emp_VAP_ratio_list_individual)
+    print('ALL_PDR_avg_std: ',ALL_pdr_ratio_list_individual)
+    print('VRU_PDR_avg_std: ',VRU_pdr_ratio_list_individual)
+    print('emp_VAP_avg_std: ',emp_VAP_ratio_list_individual)
 
     #print('*******************')
 
