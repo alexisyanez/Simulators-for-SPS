@@ -16,9 +16,9 @@ for section_index in range(0,int(time_period_all/10000)):
     #location_file_name = 'sumo_vehicle_location_'+ str(section_index)
     #location_file_name = 'manhattan_location_s20_'+ str(section_index)
     #location_file_name = 'sumo_vehicle_location' # + str(section_index)
-    location_file_name = 'v6sumo_ped_vehicle_location_sec_' + str(section_index) 
+    location_file_name = 'v2sumo_ped_vehicle_location_sec_' + str(section_index) 
     print('section_index',section_index)
-    Data=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_ped_v6/%s.csv"%(location_file_name),header=None)).tolist()
+    Data=np.array(pd.read_csv("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%(location_file_name),header=None)).tolist()
     #Data=np.array(pd.read_csv("/home/simu5g/Simulators-for-SPS/sumo_simulation/Ped_simu_SUMO/Data_ped/%s.csv"%(location_file_name),header=None)).tolist()
     NewData=[]
     for i in range(0,len(Data)):
@@ -38,9 +38,9 @@ for section_index in range(0,int(time_period_all/10000)):
         NewData.append([Data[i][0],Data[i][1],Data[i][2],type])
     
     #filename='v2manhattan_location_s20_'+str(section_index)
-    filename='type_v6sumo_ped_vehicle_location_sec_'+str(section_index)
+    filename='type_v2sumo_ped_vehicle_location_sec_'+str(section_index)
     n=0
-    f=open("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_ped_v6/%s.csv"%filename,'w',newline='')
+    f=open("C:/Users/adani/OneDrive/Documentos/GitHub/SimulatorSPS/OOP_for_SPS/traffic_data_ped_v2/%s.csv"%filename,'w',newline='')
     #f=open("/home/simu5g/Simulators-for-SPS/OOP_for_SPS/traffic_data_ped_v3/%s.csv"%filename,'w',newline='')
     
     writer=csv.writer(f)

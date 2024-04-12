@@ -334,9 +334,9 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                             individual_emp_VAP.append(VRU_rec/len_VRU_N)
                             avg_VRU_PDR_indv = []
                             for VRU in vehicle.VRUneighbour_list:
-                                avg_VRU_PDR_indv.append(VRU.transmission_statistic)
+                                avg_VRU_PDR_indv.append(np.nanmean(np.array(VRU.transmission_statistic)))
                             if avg_VRU_PDR_indv:
-                                individual_VRU_AVGPDR.append(np.nanmean(avg_VRU_PDR_indv))    
+                                individual_VRU_AVGPDR.append(np.nanmean(np.array(avg_VRU_PDR_indv)))    
                             #print(VRU_rec/len_VRU_N)
                     #print(np.average(vehicle.transmission_statistic))
                 
