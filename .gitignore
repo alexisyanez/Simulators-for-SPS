@@ -1,3 +1,4 @@
 **.pyc
 /__pycache__
 
+/sumo_simulation/Ped_simu_SUMO/Data_ped/*
