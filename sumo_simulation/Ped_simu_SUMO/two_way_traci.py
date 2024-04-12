@@ -21,8 +21,9 @@ else:
 # =============================================================================
 # change the path based on your configuration
 # =============================================================================
-sumoBinary = r"/usr/bin/sumo"  #C:\Program Files (x86)\DLR\Sumo\bin\sumo-gui.exe" # updating the SUMO path
-sumoCmd = [sumoBinary, "-c", "V4_ETSI_TR_138_913_V14_3_0_urban.sumocfg"]
+#sumoBinary = r"/usr/bin/sumo"  #C:\Program Files (x86)\DLR\Sumo\bin\sumo-gui.exe" # updating the SUMO path
+sumoBinary= "sumo" 
+sumoCmd = [sumoBinary, "-c", "V2_ETSI_TR_138_913_V14_3_0_urban.sumocfg"]  # "V4_ETSI_TR_138_913_V14_3_0_urban.sumocfg"] 
 
     
 
@@ -33,7 +34,7 @@ def vehicle_information():
     x_coordinate = np.array([])
     y_coordinate = np.array([])
     
-    while step < 640000: #1000: 
+    while step < 420100: #411000: #1000: 
        location_list=[]
        traci.simulationStep()
 
@@ -56,21 +57,22 @@ def vehicle_information():
            index +=1         
 
 
-       if 330000<step<=635000: # sampling time duration
-           filename_locations='Data_ped/v4location_for_timestep'+str(step) # each csv-file for each step
+       if 370000<step<=420000: # Para V6 305000 ;Para V5 315000; Para v3 360000;Esto para v4 330000<step<=635000: # sampling time duration
+           filename_locations='Data_ped/v2location_for_timestep'+str(step) # each csv-file for each step
            f = open('%s.csv'%filename_locations,'w',newline='')
            writer = csv.writer(f)
            for i in location_list:
                writer.writerow(i)
            f.close()
        
-       vehicle_number = len(traci.vehicle.getIDList())
-       print('step',step,"Total number of vehicles: " + str(vehicle_number))
-       print()
+       if step%10000==0:
+           vehicle_number = len(traci.vehicle.getIDList())
+           print('step',step,"Total number of vehicles: " + str(vehicle_number))
+           print()
        
-       person_number = len(traci.person.getIDList())
-       print('step',step,"Total number of person: " + str(person_number))
-       print()
+           person_number = len(traci.person.getIDList())
+           print('step',step,"Total number of person: " + str(person_number))
+           print()
 
        a += 1             
        step += 1

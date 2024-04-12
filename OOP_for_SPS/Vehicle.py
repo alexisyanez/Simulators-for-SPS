@@ -339,7 +339,7 @@ class Vehicle():
                 if current_time>start_sampling_time:
                     self.num_rec += 1
 
-                    if self.type == 1 and vehicle.type == 2:
+                    if self.type == 1 and vehicle.type == 2: #Type=1 is a VRU and Type=2 is a Car
                         if self in vehicle.VRUneighbour_list:
                             vehicle.VRUreception.append(self.index)
                         #if self in VRU_List:

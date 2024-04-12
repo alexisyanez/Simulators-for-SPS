@@ -57,10 +57,10 @@
     <flow id="flow9" type="ptw" route="r_3" begin="0" vehsPerHour="500" number="1000"/>
     <flow id="flow19" type="ptw" route="r_3" begin="0" vehsPerHour="500" number="1000"/>-->
 
-    <personFlow id="pf_0" begin="0.00" number="67" period="3">
+    <personFlow id="pf_0" begin="150.00" number="67" period="3">
         <walk route="r_0"/>
     </personFlow>
-    <personFlow id="pf_1" begin="0.00" number="67" period="3">
+    <personFlow id="pf_1" begin="150.00" number="67" period="3">
         <walk route="r_1"/>
     </personFlow>
     <!-- Vehicles, persons and containers (sorted by depart) 
