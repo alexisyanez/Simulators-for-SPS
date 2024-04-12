@@ -363,10 +363,10 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
 
             #print(emp_VAP_ratio_list_individual)
             if individual_emp_VAP:
-                emp_VAP_ratio_list_individual.append(float(individual_emp_VAP))
+                emp_VAP_ratio_list_individual.append(individual_emp_VAP)
 
             if individual_VRU_AVGPDR:
-                VRU_AVGPDR_ratio_list_individual.append(float(individual_VRU_AVGPDR))
+                VRU_AVGPDR_ratio_list_individual.append(individual_VRU_AVGPDR)
                 #emp_VAP_ratio_list_individual[0].append(np.nanmean(individual_emp_VAP))
                 #emp_VAP_ratio_list_individual[1].append(np.nanstd(individual_emp_VAP))
             #else: 
@@ -441,6 +441,9 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     else:
         std_VRU_PDR = 0  # O cualquier otro valor predeterminado  
 
+    serialized_emp_VAP = json.dumps(emp_VAP_ratio_list_individual)
+    serialized_VRU_AVGPDR = json.dumps(VRU_AVGPDR_ratio_list_individual)
+
     #if len(emp_VAP_ratio_list_individual) > 0:
     #    All_indv_emp_VAP.append(emp_VAP_ratio_list_individual)
     #else:
@@ -461,8 +464,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     "ALL_PDR_std": std_ALL_PDR,
     "VRU_PDR_avg": avg_VRU_PDR,
     "VRU_PDR_std": std_VRU_PDR,
-    "All_indv_emp_VAP": emp_VAP_ratio_list_individual,
-    "All_indv_VRU_AVGPDR": VRU_AVGPDR_ratio_list_individual,
+    "All_indv_emp_VAP": serialized_emp_VAP,
+    "All_indv_VRU_AVGPDR": serialized_VRU_AVGPDR,
     "awareness_window": int(aw),
     "target_distance": int(target_distance),
     "obstacles": obstacles_bool,
