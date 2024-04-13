@@ -471,7 +471,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     "obstacles": obstacles_bool,
     "nr": nr_bool,
     "mu": int(mu),
-    "sensing_window": int(sensing_window)
+    "sensing_window": int(sensing_window),
+    "density_scenario": int(ds_index)
     }
 
     # returning JSON object
