@@ -114,6 +114,9 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     VRUtransmission_condition=[]  # For VRU calculation
     VRUadd_loss_ratio_to_beacon_list = []  # For VRU calculation
 
+    serialized_VRU_AVGPDR=[]
+    serialized_emp_VAP=[]
+
     # Initializing buildings in urban scenario
     obstacles = {}
     obstacles_bool = obs
@@ -336,8 +339,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                             for VRU in vehicle.VRUneighbour_list:
                                 avg_VRU_PDR_indv.append(np.nanmean(np.array(VRU.transmission_statistic)))
                             if avg_VRU_PDR_indv:
-                                individual_VRU_AVGPDR.append(np.nanmean(np.array(avg_VRU_PDR_indv))) 
-                                individual_emp_VAP.append(VRU_rec/len_VRU_N)   
+                                serialized_VRU_AVGPDR.append(float(np.nanmean(np.array(avg_VRU_PDR_indv)))) # individual_VRU_AVGPDR.append(np.nanmean(np.array(avg_VRU_PDR_indv))) 
+                                serialized_emp_VAP.append(float(VRU_rec/len_VRU_N)) #individual_emp_VAP.append(VRU_rec/len_VRU_N)   
                             #print(VRU_rec/len_VRU_N)
                     #print(np.average(vehicle.transmission_statistic))
                 
@@ -363,11 +366,11 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                 VRU_pdr_ratio_list_individual[1].append(np.nanstd(VRUindividual_PDR))
 
             #print(emp_VAP_ratio_list_individual)
-            if individual_emp_VAP:
-                emp_VAP_ratio_list_individual.append(individual_emp_VAP)
+            #if individual_emp_VAP:
+            #    emp_VAP_ratio_list_individual.append(individual_emp_VAP)
 
-            if individual_VRU_AVGPDR:
-                VRU_AVGPDR_ratio_list_individual.append(individual_VRU_AVGPDR)
+            #if individual_VRU_AVGPDR:
+            #    VRU_AVGPDR_ratio_list_individual.append(individual_VRU_AVGPDR)
                 #emp_VAP_ratio_list_individual[0].append(np.nanmean(individual_emp_VAP))
                 #emp_VAP_ratio_list_individual[1].append(np.nanstd(individual_emp_VAP))
             #else: 
@@ -442,8 +445,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     else:
         std_VRU_PDR = 0  # O cualquier otro valor predeterminado  
 
-    serialized_emp_VAP = json.dumps(emp_VAP_ratio_list_individual)
-    serialized_VRU_AVGPDR = json.dumps(VRU_AVGPDR_ratio_list_individual)
+    #serialized_emp_VAP = json.dumps(emp_VAP_ratio_list_individual)
+    #serialized_VRU_AVGPDR = json.dumps(VRU_AVGPDR_ratio_list_individual)
 
     #if len(emp_VAP_ratio_list_individual) > 0:
     #    All_indv_emp_VAP.append(emp_VAP_ratio_list_individual)
