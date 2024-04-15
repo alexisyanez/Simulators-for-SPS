@@ -17,7 +17,7 @@ if __name__ == "__main__":
     RC_low = 5
     RC_high = 15
     RSRP_ratio_beacon = 0.2      
-    ds_list = [6, 5, 4] #, 3, 2]
+    ds_list = [6, 5, 4, 3, 2]
     sd = 1
     td = 200 #np.arange(25, 525, 25)
     obs_list = [False, True]
