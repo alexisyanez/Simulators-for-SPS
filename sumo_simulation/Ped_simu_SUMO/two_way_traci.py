@@ -22,7 +22,7 @@ else:
 # change the path based on your configuration
 # =============================================================================
 #sumoBinary = r"/usr/bin/sumo"  #C:\Program Files (x86)\DLR\Sumo\bin\sumo-gui.exe" # updating the SUMO path
-sumoBinary= "sumo" 
+sumoBinary= "sumo" #r"/usr/bin/sumo" # r"/home/ayanez/sumo-1_18_0" # this is for windows "sumo" 
 sumoCmd = [sumoBinary, "-c", "V2_ETSI_TR_138_913_V14_3_0_urban.sumocfg"]  # "V4_ETSI_TR_138_913_V14_3_0_urban.sumocfg"] 
 
     
@@ -58,7 +58,7 @@ def vehicle_information():
 
 
        if 370000<step<=420000: # Para V6 305000 ;Para V5 315000; Para v3 360000;Esto para v4 330000<step<=635000: # sampling time duration
-           filename_locations='Data_ped/v2location_for_timestep'+str(step) # each csv-file for each step
+           filename_locations='Data_ped/v1location_for_timestep'+str(step) # each csv-file for each step
            f = open('%s.csv'%filename_locations,'w',newline='')
            writer = csv.writer(f)
            for i in location_list:
