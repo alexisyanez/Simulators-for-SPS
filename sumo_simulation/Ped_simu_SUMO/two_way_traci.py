@@ -23,7 +23,7 @@ else:
 # =============================================================================
 #sumoBinary = r"/usr/bin/sumo"  #C:\Program Files (x86)\DLR\Sumo\bin\sumo-gui.exe" # updating the SUMO path
 sumoBinary= "sumo" #r"/usr/bin/sumo" # r"/home/ayanez/sumo-1_18_0" # this is for windows "sumo" 
-sumoCmd = [sumoBinary, "-c", "V2_ETSI_TR_138_913_V14_3_0_urban.sumocfg"]  # "V4_ETSI_TR_138_913_V14_3_0_urban.sumocfg"] 
+sumoCmd = [sumoBinary, "-c", "V1_ETSI_TR_138_913_V14_3_0_urban.sumocfg"]  # "V4_ETSI_TR_138_913_V14_3_0_urban.sumocfg"] 
 
     
 
@@ -34,7 +34,7 @@ def vehicle_information():
     x_coordinate = np.array([])
     y_coordinate = np.array([])
     
-    while step < 420100: #411000: #1000: 
+    while step < 480100: #411000: #1000: 
        location_list=[]
        traci.simulationStep()
 
@@ -57,7 +57,7 @@ def vehicle_information():
            index +=1         
 
 
-       if 370000<step<=420000: # Para V6 305000 ;Para V5 315000; Para v3 360000;Esto para v4 330000<step<=635000: # sampling time duration
+       if 430000<step<=480000: # Para V1 430000; Para V6 305000 ;Para V5 315000; Para v3 360000;Esto para v4 330000<step<=635000: # sampling time duration
            filename_locations='Data_ped/v1location_for_timestep'+str(step) # each csv-file for each step
            f = open('%s.csv'%filename_locations,'w',newline='')
            writer = csv.writer(f)
