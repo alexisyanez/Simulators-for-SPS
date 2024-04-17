@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     # Crear un grupo de procesos
     with multiprocessing.Pool(processes=num_procesos) as pool:
-        pool.map(two_way_traci, range(num_procesos))
+        pool.map(two_way_traci.main(), range(num_procesos))
 
 
 
