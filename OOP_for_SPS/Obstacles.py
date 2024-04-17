@@ -32,7 +32,7 @@ class Obstacles():
         
         # Geting the intersection between the line and the buildings 
         for i in range (0,len(self.buildings)):
-            polydiff = TxRxLine.intersection(self.buildings[i])
+            polydiff = TxRxLine.intersection(self.buildings[i]) #
             x,y = polydiff.coords.xy
             listx = list(x)
             listy = list(y)
