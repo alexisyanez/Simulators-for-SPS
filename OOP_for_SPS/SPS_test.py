@@ -116,6 +116,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
 
     serialized_VRU_AVGPDR=[]
     serialized_emp_VAP=[]
+    serialized_pdr_ratio_list=[]
 
     # Initializing buildings in urban scenario
     obstacles = {}
@@ -299,8 +300,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                 vehicle_list[i].statistic_for_reception(vehicle_list,sinr_th,noise,t,start_sampling_time)
             # Here should be the re-evaluation and pre-emption fase        
         if t>start_sampling_time and t%eval_time==0:
-            sum_tran = 0
-            sum_rec = 0     
+            total_sum_tran = 0
+            total_sum_rec = 0     
 
             sum_VRUtran = 0 # collecting metrics for VRU 
             sum_VRUrec = 0 #  collecting metrics for VRU
@@ -321,7 +322,10 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                 VRU_rec = 0
                 
                 sum_tran += vehicle.num_tran
-                sum_rec += vehicle.num_rec                             
+                sum_rec += vehicle.num_rec  
+
+                total_sum_tran += sum_tran
+                total_sum_rec += sum_rec                           
 
                 #sum_VRUtran += vehicle.VRUnum_tran
                 #sum_VRUrec += vehicle.VRUnum_rec
@@ -341,7 +345,13 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                             #individual_emp_VAP.append(VRU_rec/len_VRU_N)
                             avg_VRU_PDR_indv = []
                             for VRU in vehicle.VRUneighbour_list:
-                                avg_VRU_PDR_indv.append(np.nanmean(np.array(VRU.transmission_statistic)))
+                                # Getting vehicle index from VRU neighbour list
+                                index_v = VRU.neighbour_list.index(vehicle)
+                                # Calculate individual for the pair vehicle-VRU; PDR = Packet succesfully received / Total packet sent
+                                PDR_v_VRU = VRU.Rxneighbour_list[index_v][0]/(VRU.Rxneighbour_list[index_v][0]+VRU.Rxneighbour_list[index_v][1]) # 
+                                #aggregate PDR to the list of neighnour VRUs
+                                avg_VRU_PDR_indv.append(PDR_v_VRU)
+                                #avg_VRU_PDR_indv.append(np.nanmean(np.array(VRU.transmission_statistic)))
                             if avg_VRU_PDR_indv:
                                 serialized_VRU_AVGPDR.append(float(np.nanmean(np.array(avg_VRU_PDR_indv)))) # individual_VRU_AVGPDR.append(np.nanmean(np.array(avg_VRU_PDR_indv))) 
                                 serialized_emp_VAP.append(float(VRU_rec/len_VRU_N)) #individual_emp_VAP.append(VRU_rec/len_VRU_N)   
@@ -359,7 +369,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                 #vehicle.VRUnum_rec = 0        
                 #vehicle.transmission_statistic =
             #add_loss_ratio_to_beacon_list.append(sum_additional_loss_to_beacons/(sum_additional_loss_to_beacons+sum_rec))
-            #pdr_ratio_list.append(sum_rec/sum_tran)
+            pdr_ratio_list.append(total_sum_rec/total_sum_tran)
             #transmission_condition.append([sum_rec,sum_tran])
             if individual_PDR:
                 ALL_pdr_ratio_list_individual[0].append(np.nanmean(individual_PDR))
@@ -368,6 +378,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
             if VRUindividual_PDR:
                 VRU_pdr_ratio_list_individual[0].append(np.nanmean(VRUindividual_PDR))
                 VRU_pdr_ratio_list_individual[1].append(np.nanstd(VRUindividual_PDR))
+
+                  
 
             #print(emp_VAP_ratio_list_individual)
             #if individual_emp_VAP:
@@ -449,6 +461,14 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     else:
         std_VRU_PDR = 0  # O cualquier otro valor predeterminado  
 
+    if len(pdr_ratio_list) > 0:
+        avg_Total_pdr = float(np.nanmean(pdr_ratio_list))
+        std_Total_pdr = float(np.nanstd(pdr_ratio_list))
+        #serialized_pdr_ratio_list[1] = float(np.nanmean(ALL_pdr_ratio_list_individual[0]))
+    else:
+        avg_Total_pdr = 0
+        std_Total_pdr = 0
+            
     #serialized_emp_VAP = json.dumps(emp_VAP_ratio_list_individual)
     #serialized_VRU_AVGPDR = json.dumps(VRU_AVGPDR_ratio_list_individual)
 
@@ -468,6 +488,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     data = {
     "star_time": start_time,
     "end_time": end_time,
+    "Total_PDR_avg": avg_Total_pdr,
+    "Total_PDR_std": std_Total_pdr,
     "ALL_PDR_avg": avg_ALL_PDR,
     "ALL_PDR_std": std_ALL_PDR,
     "VRU_PDR_avg": avg_VRU_PDR,
