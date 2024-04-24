@@ -348,9 +348,11 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                                 # Getting vehicle index from VRU neighbour list
                                 index_v = VRU.neighbour_list.index(vehicle)
                                 # Calculate individual for the pair vehicle-VRU; PDR = Packet succesfully received / Total packet sent
-                                PDR_v_VRU = VRU.Rxneighbour_list[index_v][0]/(VRU.Rxneighbour_list[index_v][0]+VRU.Rxneighbour_list[index_v][1]) # 
+                                den_v = VRU.Rxneighbour_list[index_v][0]+VRU.Rxneighbour_list[index_v][1]
+                                if den_v>0:
+                                    PDR_v_VRU = VRU.Rxneighbour_list[index_v][0]/den_v # 
                                 #aggregate PDR to the list of neighnour VRUs
-                                avg_VRU_PDR_indv.append(PDR_v_VRU)
+                                    avg_VRU_PDR_indv.append(PDR_v_VRU)
                                 #avg_VRU_PDR_indv.append(np.nanmean(np.array(VRU.transmission_statistic)))
                             if avg_VRU_PDR_indv:
                                 serialized_VRU_AVGPDR.append(float(np.nanmean(np.array(avg_VRU_PDR_indv)))) # individual_VRU_AVGPDR.append(np.nanmean(np.array(avg_VRU_PDR_indv))) 
