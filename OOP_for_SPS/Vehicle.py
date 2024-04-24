@@ -43,6 +43,7 @@ class Vehicle():
         self.prepower_in_selection_window = {}
         self.best_RBG_list_beacon = []
         self.neighbour_list = []
+        self.Rxneighbour_list = [] #[number of succesfully received, number of failed received]
         self.VRUneighbour_list = []  #adding the list of neighbout for VRU
         self.VRUreception = []  # To check message reception 
         self.transmission_statistic = []
@@ -262,6 +263,7 @@ class Vehicle():
     def generate_neighbour_set(self,vehicles):
         self.neighbour_list = []
         self.VRUneighbour_list = []
+        self.Rxneighbour_list = []
         #self.VRUreception = []
         vehicles_copy = copy.copy(vehicles)
         vehicles_copy.remove(self)
@@ -269,7 +271,8 @@ class Vehicle():
         for vehicle in vehicles_copy:
             if self.distance(vehicle)<=self.target_distance:
                 self.neighbour_list.append(vehicle)
-                if vehicle.type == 1 and self.type == 2: 
+                self.Rxneighbour_list.append([0,0])
+                if vehicle.type == 1 and self.type == 2:  #Type 1 corresponds to VRU, type 2 to Cars
                     self.VRUneighbour_list.append(vehicle)
                     #self.VRUreception.append(0)                            
                                 
@@ -338,7 +341,7 @@ class Vehicle():
                 
                 if current_time>start_sampling_time:
                     self.num_rec += 1
-
+                    self.Rxneighbour_list[self.neighbour_list.index(vehicle)][0]=self.Rxneighbour_list[self.neighbour_list.index(vehicle)][0]+1 # Incrementing succefull receptión for each vehicle
                     if self.type == 1 and vehicle.type == 2: #Type=1 is a VRU and Type=2 is a Car
                         if self in vehicle.VRUneighbour_list:
                             vehicle.VRUreception.append(self.index)
@@ -352,6 +355,8 @@ class Vehicle():
 
             else:
                 vehicle.bm_reception_record[str([self.index,self.v_RBG.timeslot])]=0
+                self.Rxneighbour_list[self.neighbour_list.index(vehicle)][1]=self.Rxneighbour_list[self.neighbour_list.index(vehicle)][1]+1 # Incrementing failed receptión for each vehicle
+
         if num_packet==0:
             self.transmission_statistic.append(None)
         else:
