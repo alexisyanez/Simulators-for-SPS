@@ -1,8 +1,8 @@
 import shapely
-from shapely import LineString, Point, Polygon
+#from shapely import LineString, Point, Polygon
 from Obstacles import Obstacles
 import numpy as np
-point = Point(0, 0)
+#point = Point(0, 0)
 #print(shapely.distance(Point(10, 0), point))
 #print(shapely.distance(LineString([(1, 1), (1, -1)]), point))
 #print(shapely.distance(Polygon([(3, 0), (5, 0), (5, 5), (3, 5), (3, 0)]), point))
@@ -11,7 +11,7 @@ point = Point(0, 0)
 
 
 locationTx=[276,432]
-locationRx=[249,100]
+locationRx=[276,800]
 obstacles = Obstacles()
 print(obstacles.getObsaclesLossess(locationTx,locationRx))
 

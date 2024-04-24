@@ -33,13 +33,17 @@ class Obstacles():
         # Geting the intersection between the line and the buildings 
         for i in range (0,len(self.buildings)):
             polydiff = TxRxLine.intersection(self.buildings[i]) #
-            x,y = polydiff.coords.xy
-            listx = list(x)
-            listy = list(y)
+            xy = shapely.get_coordinates(polydiff) #polydiff.coords.xy
+            print(xy)
+            #x=xy[0]
+            #y=xy[1]
+            #listx = list(x)
+            #listy = list(y)
             #print(listx)
-            if len(listx) > 1 and len(listy) > 1 :
-                pointA=Point(listx[0],listy[0])
-                pointB=Point(listx[1],listy[1])
+            #print(listy)
+            if len(xy)>1: #len(listx) > 1 and len(listy) > 1 :
+                pointA=Point(xy[0][0],xy[0][1]) #listx[0],listy[0])
+                pointB=Point(xy[1][0],xy[1][1]) #listx[1],listy[1])
                 TotalLoss_dB =  2*self.beta + pointA.distance(pointB)*self.gamma #TotalLoss_dB + 2*self.beta + shapely.distance(pointA,pointB)*self.gamma
                 #TotalLoss_mW = TotalLoss_mW + 10**(TotalLoss_dB/10) #10**((2*self.beta)/10) + 10**((pointA.distance(pointB)*self.gamma)/10)
         #TotalLoss = 10**(TotalLoss_dB)+10**
