@@ -11,16 +11,16 @@ def wrapper(args):
 
 if __name__ == "__main__":
 
-    time_period = 1201 #10201    
+    time_period = 10201 #10201    
     start_sampling_time = 200
     interval = 50
     RC_low = 5
     RC_high = 15
     RSRP_ratio_beacon = 0.2      
-    ds_list = [1] #,0] #6, 5, 4, 3, 2]
+    ds_list = [6, 5, 4, 3, 2, 1, 0]
     sd = 1
     td = 200 #np.arange(25, 525, 25)
-    obs_list = [False] #, True]
+    obs_list = [False, True]
     aw_list = 200 #[10, 50, 100, 200, 500]
     nr_list = True #[False, True]  
     mu_list = 0 #[0,1,2]
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     #for conf in param:
     
     # Número máximo de procesos (8 para usar 8 CPU)
-    num_procesos = 1
+    num_procesos = 14
     resultados=[]
     # Crear un grupo de procesos
     with multiprocessing.Pool(processes=num_procesos) as pool:

@@ -34,7 +34,7 @@ class Obstacles():
         for i in range (0,len(self.buildings)):
             polydiff = TxRxLine.intersection(self.buildings[i]) #
             xy = shapely.get_coordinates(polydiff) #polydiff.coords.xy
-            print(xy)
+            #print(xy)
             #x=xy[0]
             #y=xy[1]
             #listx = list(x)

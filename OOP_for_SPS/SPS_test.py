@@ -186,7 +186,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
 
     ObserveVehicles = [[] for i in range(0,time_period)]
     num_vehicle=int(len(LocationDataAll)/time_period_all)
-    print('VehicleNum',num_vehicle)
+    #print('VehicleNum',num_vehicle)
     for i in range(0,time_period):
         ObserveVehicles[i]=LocationDataAll[int(i*num_vehicle):int((i+1)*num_vehicle)]  
     vehicle_location_ini = ObserveVehicles[0]
@@ -346,9 +346,13 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                             avg_VRU_PDR_indv = []
                             for VRU in vehicle.VRUneighbour_list:
                                 # Getting vehicle index from VRU neighbour list
-                                index_v = VRU.neighbour_list.index(vehicle)
+                                den_v=0
+                                try:
+                                    index_v = VRU.neighbour_list.index(vehicle)
                                 # Calculate individual for the pair vehicle-VRU; PDR = Packet succesfully received / Total packet sent
-                                den_v = VRU.Rxneighbour_list[index_v][0]+VRU.Rxneighbour_list[index_v][1]
+                                    den_v = VRU.Rxneighbour_list[index_v][0]+VRU.Rxneighbour_list[index_v][1]
+                                except:
+                                    den_v=0
                                 if den_v>0:
                                     PDR_v_VRU = VRU.Rxneighbour_list[index_v][0]/den_v # 
                                 #aggregate PDR to the list of neighnour VRUs
