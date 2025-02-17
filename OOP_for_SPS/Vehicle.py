@@ -184,10 +184,12 @@ class Vehicle():
     # check if the slot can be measured by the object vehicle, due to the half duplex
     def observation_boolean(self, v_RBG):
         timeslot = v_RBG.timeslot
-        if timeslot == self.v_RBG.timeslot:
-            return False
-        else:
-            return True    
+        if self.cl_role==0:
+            if timeslot == self.v_RBG.timeslot:
+                return False
+            else:
+                return True
+        else: return False
 
     def sense_single_RBG(self, v_RBG, vehicles):
         sum_power = 0
@@ -198,8 +200,13 @@ class Vehicle():
         if self.observation_boolean(v_RBG) == True:
             for vehicle in vehicles_copy:
                 #print(vehicle.v_RBG.subchannel,subchannel,vehicle.v_RBG.timeslot,timeslot)
-                if vehicle.v_RBG.subchannel == subchannel and vehicle.v_RBG.timeslot == timeslot and vehicle.cl_role==0:
-                    sum_power += self.receive_power(vehicle)
+                if vehicle.cl_role==0:
+                    try:
+                        if vehicle.v_RBG.subchannel == subchannel and vehicle.v_RBG.timeslot == timeslot: # and vehicle.cl_role==0:
+                            sum_power += self.receive_power(vehicle)
+                    except AttributeError:
+                        print("-Waring: vehicle.v_RBG is None")
+                        #print("-vehicle is: ",vehicle.type)
         else:
             sum_power = float("inf")
         return sum_power
@@ -283,45 +290,57 @@ class Vehicle():
             if self.distance(vehicle)<=self.target_distance:
                 self.neighbour_list.append(vehicle)
                 self.Rxneighbour_list.append([0,0])
-                if vehicle.type == 1 and self.type == 2:  #Type 1 corresponds to VRU, type 2 to Cars
+                if vehicle.type == 1: # and self.type == 2:  #Type 1 corresponds to VRU, type 2 to Cars
                     self.VRUneighbour_list.append(vehicle)
                     #self.VRUreception.append(0)
         
         # Chequing if there are a leader in the VRU neigbhour and if it's cluster not exceed the maximum member
         if self.cl_bool:
+            #print("Ive pass the first conditional, so clustering is acctivated")
             if not self.my_cluster: # Checkeando que no tenga asignado un cluster
+                #print("Ive pass the second conditional, so I dont have a cluster assigned")
                 if self.type == 1: # Checking the user is VRU
-                    alone_VRUs = [] 
+                    #print("Ive pass third conditional, so Im a VRU")
+                    alone_VRUs = []
+                    #print('the length of the neighbout list is:'+str(len(self.VRUneighbour_list)))
                     for VRU in self.VRUneighbour_list:
-                        if VRU.cl_role == 0 and len(VRU.my_cluster) < self.max_cl_member and VRU.my_cluster and (self.vel_diff(CM.speed,CM.angle) <= self.max_speed_dif) and self.distance(VRU)<=self.max_dsitance_cl: # Looking for a leader with a cluster created
+                        if VRU.cl_role == 0 and len(VRU.my_cluster) < self.max_cl_member and VRU.my_cluster and (self.vel_diff(VRU.speed,VRU.angle) <= self.max_speed_dif) and self.distance(VRU)<=self.max_dsitance_cl: # Looking for a leader with a cluster created
+                            #print("I found a cluster so Im joining it")
                             VRU.my_cluster.append(self) #joining a cluster 
                             self.cl_role=1
                             self.cl_id=VRU.cl_id
-                        if  VRU.Cl_role == 0 and not VRU.my_cluster: # Looking for active stand-alone VRU
+                        if  VRU.cl_role == 0 and not VRU.my_cluster: # Looking for active stand-alone VRU
+                            #print("I found neigbors alone")
                             alone_VRUs.append(VRU)
                     if len(alone_VRUs) > self.min_cl_member: # Creating a cluster
                         self.cl_role=0
                         self.id=self.all_clusters.getClusterID(t)
+                        #print("I passed the fourth conditional so im geting cearting a cluster and getting an ID")
                         self.my_cluster=alone_VRUs
                         for cl_member in alone_VRUs:
-                            cl_member.Cl_role=1 #changing the role for the cluster members                  
+                            cl_member.cl_role=1 #changing the role for the cluster members                  
             else:
                 for CM in self.my_cluster:
-                    if CM.cl_role == 0:
+                    if CM.cl_role == 0 and self.cl_role==1:
                         if self.distance(CM)>self.max_dsitance_cl or (self.vel_diff(CM.speed,CM.angle) > self.max_speed_dif): # Leaving cluster if im out of range or exceed the speed diference
+                            #print("Im leaving the cluster beacuse Im far away to the CH")
                             for CM2 in self.my_cluster:
                                 CM2.my_cluster.remove(self) #removing from all cluster lists
-                            
+                            self.cl_role=0
+                            print("leaving cluster and changing role to active stand-alone")
 
                 if 0 < len(self.my_cluster) < self.min_cl_member and self.cl_role == 0: #Deleting a Cluster if is a Leader
+                    #print("since I am the CH im deleting the cluster because we dont have enough memebers")
                     self.all_clusters.deleteClusterID(self.cl_id,t)
 
                     for CM in self.my_cluster:
                         CM.my_cluster = []
                         CM.cl_id = 0
+                        CM.cl_role= 0
                     
                     self.my_cluster = []
                     self.cl_id = 0
+                    print("Deleting cluster being a Leader")
 
     def sum_interference_power(self,receive_vehicle,vehicles):
         sum_interference = 0
@@ -329,12 +348,22 @@ class Vehicle():
         vehicles_copy.remove(self)
         vehicles_copy.remove(receive_vehicle)
 
-        if self.v_RBG.timeslot == receive_vehicle.v_RBG.timeslot:
-            sum_interference = float("inf")
-        else:
-            for vehicle in vehicles_copy:
-                if vehicle.v_RBG.timeslot == self.v_RBG.timeslot and vehicle.v_RBG.subchannel == self.v_RBG.subchannel and vehicle.cl_role==0: #only considering leader as transmitter
-                    sum_interference += receive_vehicle.receive_power(vehicle)
+        if receive_vehicle.cl_role==0:
+            try:
+                if self.v_RBG.timeslot == receive_vehicle.v_RBG.timeslot:
+                    sum_interference = float("inf")
+                else:
+                    for vehicle in vehicles_copy:
+                        if vehicle.cl_role==0:
+                            try:
+                                if vehicle.v_RBG.timeslot == self.v_RBG.timeslot and vehicle.v_RBG.subchannel == self.v_RBG.subchannel: # and vehicle.cl_role==0: #only considering leader as transmitter
+                                    sum_interference += receive_vehicle.receive_power(vehicle)
+                            except AttributeError:
+                                print("-In Interference Power Warning: vehicle.v_RBG is None")
+                                #print("-In Interference Power vehicle is: ",vehicle.type)
+            except AttributeError:
+                print("-In Interference Power Warning: received vehicle.v_RBG is None")
+                                #print("-In Interference Power vehicle is: ",vehicle.type)
         return sum_interference
 
     

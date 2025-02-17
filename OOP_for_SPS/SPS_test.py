@@ -262,6 +262,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     channel = Channel(num_subch, interval)
     # generate messages
     for i in range(num_vehicle):
+        #if vehicle_list[i].cl_role==0:
         vehicle_list[i].message_list_ini(time_period)
         vehicle_list[i].generate_beacon(interval, 200, time_period)
             
@@ -275,8 +276,9 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
             # update location and sensing_window
             vehicle_list[i].update_location(ObserveVehicles[t][i])
             
-            if vehicle_list[i].type==1 and vehicle_list[i].cl_role==1 and cl_bool:
-                continue 
+            # Dont hop this section in order to avoid RBG errors 
+            #if vehicle_list[i].type==1 and vehicle_list[i].cl_role==1 and cl_bool:
+            #    continue 
 
 
             if t==0:
@@ -292,17 +294,20 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
             #####################
             # Sensing procedure #
             #####################
-            
+
+            #Looking if everyone is perfming selections but just the cl_role==0 will record statistics
+            #if vehicle_list[i].cl_role==0:
             vehicle_list[i].generate_RBGlist_1100ms(t, RBG_list, sensing_window)
-                      
             vehicle_list[i].update_sensing_result(t, vehicle_list, RBG_list, sensing_window)
+
             ins=0
+
             if t>0:
             ############################
             # (Re-)Selection procedure #
             ############################
-                if vehicle_list[i].message_list[t]!=None:
-                    #vehicle_list[i].generate_neighbour_set(vehicle_list) # Removing this line we are not updating in every step the list of neigbhours
+                if vehicle_list[i].message_list[t]!=None: # and vehicle_list[i].cl_role==0:
+                    vehicle_list[i].generate_neighbour_set(vehicle_list,t) #we should update the neighbor in all steps, previous comment: Removing this line we are not updating in every step the list of neigbhours
                     vehicle_list[i].generate_RBGs_in_selection_window(t,RBG_list,interval)
                    
                     # Here is the selection for the beacon slot
@@ -312,38 +317,48 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
             
             #######################
             # Re-evaluation check #
-            #######################        
-            if t>0 and t<vehicle_list[i].v_RBG.timeslot - T3 and t > vehicle_list[i].lastSel_t and ins==0 and nr_bool:
+            #######################
+            if True: #vehicle_list[i].cl_role==0:        
+                if t>0 and t<vehicle_list[i].v_RBG.timeslot - T3 and t > vehicle_list[i].lastSel_t and ins==0 and nr_bool:
+                    #print("simulator in instant t="+str(t))
                 
                 #vehicle_list[i].generate_RBGlist_1100ms(t, RBG_list, sensing_window)
                 #vehicle_list[i].update_sensing_result(t, vehicle_list, RBG_list, sensing_window)
                         
-                vehicles_copy=copy.copy(vehicle_list[i].neighbour_list)
+                    vehicles_copy=copy.copy(vehicle_list[i].neighbour_list)
                 #vehicles_copy.remove(vehicle_list[i])
-                timeslot = vehicle_list[i].v_RBG.timeslot
-                subchannel = vehicle_list[i].v_RBG.subchannel
-                busy=0
-                for vehicle in vehicles_copy:
+                    timeslot = vehicle_list[i].v_RBG.timeslot
+                    subchannel = vehicle_list[i].v_RBG.subchannel
+                    busy=0
+                    for vehicle in vehicles_copy:
                         #print(vehicle.v_RBG.subchannel,subchannel,vehicle.v_RBG.timeslot,timeslot)
-                    if vehicle.v_RBG.subchannel == subchannel and vehicle.v_RBG.timeslot == timeslot:
-                            busy=1
-                if busy == 1: # if the slot is bussy the vehicle trigger again the re-selection procedure
-                    vehicle_list[i].reselection_counter = 0
-                    vehicle_list[i].v_RBG.timeslot = 0     
+                        if vehicle.cl_role==0:
+                            #if vehicle.v_RBG is None: ## I just define this at the begining for everyone
+                            #    vehicle.message_list_ini(time_period)
+                            #    vehicle.generate_beacon(interval, 200, time_period)
+                            try:
+                                if vehicle.v_RBG.subchannel == subchannel and vehicle.v_RBG.timeslot == timeslot:
+                                    busy=1
+                            except AttributeError:
+                                print("--Warning: vehicle.v_RBG is none , min_cl is:"+str(mincl)+"; max_speed_diff is:"+str(msdcl)+"; max_dist_clust is:"+str(mdcl))
+                                #print("--vehicle is: ",vehicle.type)
+                    if busy == 1: # if the slot is bussy the vehicle trigger again the re-selection procedure
+                        vehicle_list[i].reselection_counter = 0
+                        vehicle_list[i].v_RBG.timeslot = 0     
                                    
                     #vehicle_list[i].generate_RBGs_in_selection_window(t,RBG_list,interval)                   
                     # Here is the selection for the beacon slot
                     #vehicle_list[i].RBG_selection_beacon(RSRP_ratio_beacon, RBG_list, t, channel)
                     #vehicle_list[i].lastSel_t = t
-                ins=1
+                    ins=1
             ########################
             # Message transmission #
             ########################           
-            if t>0 and t == vehicle_list[i].v_RBG.timeslot:
+                if t>0 and t == vehicle_list[i].v_RBG.timeslot and vehicle_list[i].cl_role==0:
                 # statistic pdr for beacon messages
 
                 #print('vehicle= '+str(i) + ' tiempo= '+str(t))
-                vehicle_list[i].statistic_for_reception(vehicle_list,sinr_th,noise,t,start_sampling_time)
+                    vehicle_list[i].statistic_for_reception(vehicle_list,sinr_th,noise,t,start_sampling_time)
             # Here should be the re-evaluation and pre-emption fase        
         if t>start_sampling_time and t%eval_time==0:
             total_sum_tran = 0
@@ -393,7 +408,8 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
                             avg_VRU_PDR_indv = []
                             avg_VRU_PDR_indv_pair = []
                             for VRU in vehicle.VRUneighbour_list:
-                                avg_VRU_PDR_indv.append(np.nanmean(np.array(VRU.transmission_statistic)))
+                                if len(np.array(VRU.transmission_statistic))>0:
+                                    avg_VRU_PDR_indv.append(np.nanmean(np.array(VRU.transmission_statistic)))
                                 # Getting vehicle index from VRU neighbour list
                                 den_v=0
                                 try:
@@ -587,6 +603,7 @@ def main(time_period,target_distance,start_sampling_time,interval,RC_low,RC_high
     "min_cl": int(mincl),
     "max_cl": int(maxcl),
     "max_speed_diff": int(msdcl),
+    "max_dist_clust": int(mdcl),
     "density_scenario": int(ds_index)
     }
 

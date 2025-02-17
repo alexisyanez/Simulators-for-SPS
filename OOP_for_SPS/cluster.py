@@ -4,6 +4,7 @@ class cluster():
     
     def __init__(self):
         self.cluster_IDs =[[],[],[]]    
+        #print("cluster class initialization")
        
     def getClusterID(self,time):
         while True:
@@ -14,6 +15,7 @@ class cluster():
                 return C_ID
 
     def deleteCluster(self,ID,time):
+        #print("Im deleting cluster method")
         ind=self.cluster_IDs[0].index(ID)
         self.cluster_IDs[2][ind]=time
 
