@@ -419,8 +419,15 @@ class Vehicle():
                     self.num_rec += 1
                     self.Rxneighbour_list[self.neighbour_list.index(vehicle)][0]=self.Rxneighbour_list[self.neighbour_list.index(vehicle)][0]+1 # Incrementing succefull receptión for each vehicle
                     if self.type == 1 and vehicle.type == 2: #Type=1 is a VRU and Type=2 is a Car
-                        if self in vehicle.VRUneighbour_list:
+                        if self in vehicle.VRUneighbour_list and self not in vehicle.VRUreception:
                             vehicle.VRUreception.append(self.index)
+                            # adding the cluster info to the reception from vehicles
+                            if len(self.my_cluster) > 1:
+                                for cm in self.my_cluster:
+                                    if cm in vehicle.VRUneighbour_list and cm not in vehicle.VRUreception:
+                                        vehicle.VRUreception.append(cm.index)
+
+
                         #if self in VRU_List:
                         #    VRU_index = VRU_List.index(self)
                         #    vehicle.VRUreception[VRU_index]=1

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import shapely
-=======
-#import shapely
->>>>>>> f96bd5f16050c5c36add83514447fe7e6800d28d
 #from shapely import LineString, Point, Polygon
 from Obstacles import Obstacles
 import numpy as np
