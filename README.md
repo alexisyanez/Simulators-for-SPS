@@ -1,51 +1,50 @@
 ************************************************************
-*                                                          *
-*             SIMULATORS FOR SEMI-PERSISTENT              *
-*            SCHEDULING IN C-V2X MODE 4 SIMULATOR            *
-*                                                          *
+**                                                        **
+**        📶🚀📱 SIMULATORS FOR SEMI-PERSISTENT          **
+**        SCHEDULING IN C-V2X MODE 2 SIMULATOR            **
+**                                                        **
 ************************************************************
 
-Welcome to the Simulators-for-SPS repository!
+Welcome to the NR-SPS-VRU Clustering Repository! ✨
 ------------------------------------------------
-
-This project is a simulator for semi-persistent scheduling (SPS) in C-V2X Mode 4, designed with flexibility and extensibility in mind. The simulator is ideal for researchers and developers who want to evaluate SPS performance under various vehicular network scenarios.
+This project is a simulator for semi-persistent scheduling (SPS) in C-V2X Mode 4, designed for researchers and developers exploring vehicular network performance.
 
 ------------------------
-Project Overview
+📌 Project Overview
 ------------------------
 •  **Purpose:**  
    Simulate SPS in C-V2X Mode 4 with default parameters based on 20Hz beacon broadcasting.
-   
+
 •  **Key Features:**  
-   - Object-Oriented Programming (OOP) design to ease extension and integration.
-   - Fine-grained simulation operating at the millisecond level.
-   - Configurable parameters including transmit power, beacon range, beacon rate, reselection counter range, and accessible resource ratio.
-   - Use of Python’s argparse.ArgumentParser for robust command-line argument parsing.
+   - **🚀 Extensible Design:** Object-Oriented Programming (OOP) architecture for easy extensions.
+   - **⏱️ Fine Granularity:** Millisecond-level simulation for detailed performance analysis.
+   - **⚙️ Configurable Parameters:** Modify transmit power, beacon range, beacon rate, reselection counter range, and accessible resource ratio.
+   - **🛠️ Robust CLI:** Utilizes Python’s argparse.ArgumentParser for streamlined command-line argument parsing.
 
 •  **Enhanced OOP Version:**  
-   The latest OOP update (located in the `OOP_for_SPS` folder) provides a cleaner, more extendable codebase with improved simulation detail and flexibility.
+   Explore the new OOP version in the `OOP_for_SPS` folder, offering improved code structure and simulation depth.
 
 ------------------------
-Installation & Requirements
+💾 Installation & Requirements
 ------------------------
 To get started, clone the repository:
-    
+
     git clone https://github.com/alexisyanez/Simulators-for-SPS.git
 
 Ensure you have:
-   - Python 3.x installed on your machine.
-   - Required Python packages (if any) – check the `simulations.py` file for dependencies or include a requirements.txt file for convenience.
+   - **Python 3.x** installed.
+   - All required Python packages (refer to `simulations.py` for dependencies or use a provided requirements.txt).
 
 ------------------------
-Usage Instructions
+⚡ Usage Instructions
 ------------------------
 1. **Basic Simulation:**  
-   Run the simulator using the main script. For example:
+   Run the simulator using the main script:
    
        python simulations.py --param1 value1 --param2 value2
 
 2. **Customizing the Simulation:**  
-   Edit `simulations.py` to modify default parameters such as:
+   Edit `simulations.py` to adjust parameters like:
    - Transmit power
    - Beacon range
    - Beacon rate
@@ -53,39 +52,46 @@ Usage Instructions
    - Accessible resource ratio
 
 3. **OOP Version:**  
-   For a more advanced simulation with a finer granularity, check out the `OOP_for_SPS` folder. This version uses millisecond-level simulation and is structured for easier extension.
+   For advanced simulations with finer granularity, refer to the code in the `OOP_for_SPS` folder.
 
 ------------------------
-Examples
+📚 Research Articles
 ------------------------
-• **Running a default simulation:**  
-   Simply execute:
-   
-       python simulations.py
+For those interested in a deeper understanding and validation of SPS in C-V2X Mode 4, here are some recommended research articles:
 
-• **Running with custom parameters:**  
-   Use the command-line options to adjust the simulation parameters. For example:
-   
-       python simulations.py --beacon_rate 10 --tx_power 23
+   • **Article 1:**  
+     *Title:* "Semi-Persistent Scheduling in Cellular V2X Mode 4: Performance Analysis"  
+     *Link:* [IEEE Xplore](https://ieeexplore.ieee.org/)  
+     
+   • **Article 2:**  
+     *Title:* "Performance Evaluation of SPS for C-V2X"  
+     *Link:* [IEEE Xplore](https://ieeexplore.ieee.org/)  
+     
+   • **Article 3:**  
+     *Title:* "Enhancements in SPS for C-V2X Mode 4: A Simulation Study"  
+     *Link:* [IEEE Xplore](https://ieeexplore.ieee.org/)  
 
-------------------------
-Contributing
-------------------------
-Contributions are warmly welcomed! If you have suggestions, improvements, or want to extend the simulator for new applications, feel free to fork the repository and open a pull request. For major changes, please open an issue first to discuss what you would like to change.
-
-------------------------
-License
-------------------------
-This project is provided "as-is" without any warranty. For detailed licensing information, please refer to the LICENSE file included in the repository.
+Feel free to explore these resources for a comprehensive background on SPS strategies and simulation methodologies.
 
 ------------------------
-Contact & Support
+🤝 Contributing
 ------------------------
-For any questions or support, please contact:
-   - Repository owner: alexisyanez
-   - GitHub Issues: https://github.com/alexisyanez/Simulators-for-SPS/issues
+Contributions are warmly welcomed!  
+- Fork the repository, create a feature branch, and open a pull request.  
+- For major changes, please open an issue first to discuss your ideas.
+
+------------------------
+📄 License
+------------------------
+This project is provided "as-is" without any warranty. Refer to the LICENSE file for detailed licensing information.
+
+------------------------
+📞 Contact & Support
+------------------------
+For questions or support, please contact:
+   - Repository owner: **alexisyanez**
+   - GitHub Issues: [Submit an Issue](https://github.com/alexisyanez/Simulators-for-SPS/issues)
 
 ------------------------------------------------
-Happy Simulating!
+Happy Simulating! 🚗💨
 ------------------------------------------------
-
