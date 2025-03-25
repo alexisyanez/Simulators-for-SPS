@@ -1,4 +1,5 @@
-# 📶🚀📱 SIMULATORS FOR SEMI-PERSISTENT SCHEDULING IN C-V2X MODE 2 SIMULATOR           
+# 📶🚀📱 SIMULATORS FOR SEMI-PERSISTENT SCHEDULING 
+# IN C-V2X MODE 2 SIMULATOR           
 
 
 Welcome to the NR-SPS-VRU Clustering Repository! ✨
